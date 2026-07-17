@@ -1,0 +1,46 @@
+{
+  "id": "ink-ivory",
+  "metadata": {
+    "name": "Ink & Ivory",
+    "summary": "克制的暖白编辑风，强调排版、细线和清晰层级。",
+    "description": "克制的暖白编辑风，强调排版、细线和清晰层级。",
+    "style": "editorial",
+    "license": "MIT",
+    "provenance": "Original CSS-only preset; no third-party imagery."
+  },
+  "tokens": {
+    "canvas": "#f7f4ed",
+    "surface": "#fffdf8",
+    "surfaceRaised": "#ffffff",
+    "text": "#211f1b",
+    "muted": "#665f55",
+    "accent": "#8a4b2a",
+    "accentText": "#ffffff",
+    "border": "#cec5b7",
+    "focus": "#285f8f",
+    "success": "#2f6b4f",
+    "warning": "#8a5a12",
+    "danger": "#a33b33",
+    "info": "#285f8f",
+    "codeSurface": "#eee9df",
+    "terminalSurface": "#1e2022",
+    "diffAddSurface": "#dcecdf",
+    "diffRemoveSurface": "#f3dddd",
+    "approvalSurface": "#f5ead2",
+    "radiusSmall": "4px",
+    "radiusMedium": "8px",
+    "radiusLarge": "12px",
+    "shadowLow": "0 1px 2px rgba(33,31,27,.08)",
+    "shadowHigh": "0 12px 30px rgba(33,31,27,.13)",
+    "bodyFont": "Inter, ui-sans-serif, system-ui, sans-serif",
+    "displayFont": "Georgia, Cambria, Times New Roman, serif"
+  },
+  "capabilities": {
+    "mode": "light",
+    "cssOnly": true,
+    "userArt": false,
+    "glassChrome": false,
+    "tactileControls": false,
+    "experimental": false
+  }
+}

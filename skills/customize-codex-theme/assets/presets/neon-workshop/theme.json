@@ -1,0 +1,46 @@
+{
+  "id": "neon-workshop",
+  "metadata": {
+    "name": "Neon Workshop",
+    "summary": "深色工程工作台，以青绿与紫色光标强调操作状态。",
+    "description": "深色工程工作台，以青绿与紫色光标强调操作状态。",
+    "style": "dark-workshop",
+    "license": "MIT",
+    "provenance": "Original CSS-only preset; no third-party imagery."
+  },
+  "tokens": {
+    "canvas": "#11141a",
+    "surface": "#181d26",
+    "surfaceRaised": "#212836",
+    "text": "#f2f5f7",
+    "muted": "#a8b0be",
+    "accent": "#4fd1c5",
+    "accentText": "#071412",
+    "border": "#364050",
+    "focus": "#7fe7df",
+    "success": "#69d391",
+    "warning": "#e4bd67",
+    "danger": "#ff7b7b",
+    "info": "#75bdf5",
+    "codeSurface": "#0e1117",
+    "terminalSurface": "#090c11",
+    "diffAddSurface": "#173a2b",
+    "diffRemoveSurface": "#412326",
+    "approvalSurface": "#3a3320",
+    "radiusSmall": "5px",
+    "radiusMedium": "9px",
+    "radiusLarge": "14px",
+    "shadowLow": "0 1px 3px rgba(0,0,0,.34)",
+    "shadowHigh": "0 16px 38px rgba(0,0,0,.48)",
+    "bodyFont": "Inter, ui-sans-serif, system-ui, sans-serif",
+    "displayFont": "Inter, ui-sans-serif, system-ui, sans-serif"
+  },
+  "capabilities": {
+    "mode": "dark",
+    "cssOnly": true,
+    "userArt": false,
+    "glassChrome": false,
+    "tactileControls": false,
+    "experimental": false
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "soft-tactile",
+  "metadata": {
+    "name": "Soft Tactile",
+    "summary": "低密度控件采用轻拟物阴影，工作区保持平整清晰。",
+    "description": "低密度控件采用轻拟物阴影，工作区保持平整清晰。",
+    "style": "neumorphism",
+    "license": "MIT",
+    "provenance": "Original CSS-only preset; no third-party imagery."
+  },
+  "tokens": {
+    "canvas": "#e6ebf1",
+    "surface": "#eef2f6",
+    "surfaceRaised": "#f4f7fa",
+    "text": "#26313d",
+    "muted": "#5e6b78",
+    "accent": "#39799b",
+    "accentText": "#ffffff",
+    "border": "#aab4c0",
+    "focus": "#17678f",
+    "success": "#34785a",
+    "warning": "#876016",
+    "danger": "#ae4148",
+    "info": "#346f98",
+    "codeSurface": "#dbe1e8",
+    "terminalSurface": "#19232d",
+    "diffAddSurface": "#d3e8db",
+    "diffRemoveSurface": "#ecd5d8",
+    "approvalSurface": "#eee2c2",
+    "radiusSmall": "9px",
+    "radiusMedium": "15px",
+    "radiusLarge": "22px",
+    "shadowLow": "3px 3px 7px #aab4c0, -3px -3px 7px #ffffff",
+    "shadowHigh": "8px 8px 18px #aab4c0, -8px -8px 18px #ffffff",
+    "bodyFont": "Inter, ui-sans-serif, system-ui, sans-serif",
+    "displayFont": "Inter, ui-sans-serif, system-ui, sans-serif"
+  },
+  "capabilities": {
+    "mode": "light",
+    "cssOnly": true,
+    "userArt": false,
+    "glassChrome": false,
+    "tactileControls": true,
+    "experimental": true
+  }
+}

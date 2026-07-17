@@ -1,0 +1,4 @@
+interface:
+  display_name: "Customize Codex Theme"
+  short_description: "Design, try, switch, and restore Codex desktop themes"
+  default_prompt: "Use $customize-codex-theme to design or safely try a Codex desktop theme without restarting until I approve."

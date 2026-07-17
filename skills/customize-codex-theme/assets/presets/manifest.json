@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "themes": [
+    { "id": "ink-ivory", "path": "ink-ivory" },
+    { "id": "paper-workshop", "path": "paper-workshop" },
+    { "id": "neon-workshop", "path": "neon-workshop" },
+    { "id": "expressive-signal", "path": "expressive-signal" },
+    { "id": "liquid-focus", "path": "liquid-focus" },
+    { "id": "soft-tactile", "path": "soft-tactile" }
+  ]
+}

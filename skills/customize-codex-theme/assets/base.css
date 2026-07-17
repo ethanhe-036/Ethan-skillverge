@@ -1,0 +1,284 @@
+/* Codex Theme Studio: semantic renderer surfaces only; native OS menus are out of scope. */
+html.codex-theme {
+  color-scheme: var(--ct-color-scheme);
+  accent-color: var(--ct-accent);
+  font-family: var(--ct-body-font);
+  background: var(--ct-canvas);
+}
+
+html.codex-theme body {
+  color: var(--ct-text) !important;
+  background-color: var(--ct-canvas) !important;
+  background-image: var(--ct-user-art, none);
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+html.codex-theme.codex-theme-has-art :where(main, aside, nav, [role="main"], [role="complementary"], [data-testid*="sidebar" i]) {
+  background-color: color-mix(in srgb, var(--ct-surface) 90%, transparent) !important;
+}
+
+html.codex-theme ::selection {
+  color: var(--ct-accent-text);
+  background: var(--ct-accent);
+}
+
+html.codex-theme :where(h1, h2, h3, h4, h5, h6) {
+  color: var(--ct-text) !important;
+  font-family: var(--ct-display-font);
+}
+
+html.codex-theme :where(main, aside, nav, [role="main"], [role="complementary"], [data-testid*="sidebar" i]) {
+  color: var(--ct-text);
+  background-color: var(--ct-surface) !important;
+  border-color: var(--ct-border) !important;
+}
+
+html.codex-theme :where(header, footer, [data-testid*="header" i], [data-testid*="toolbar" i]) {
+  color: var(--ct-text);
+  background-color: var(--ct-surface-raised) !important;
+  border-color: var(--ct-border) !important;
+}
+
+html.codex-theme :where(
+  [role="dialog"],
+  [role="menu"],
+  [role="listbox"],
+  [role="tooltip"],
+  [data-radix-popper-content-wrapper] > *,
+  [data-testid*="popover" i],
+  [data-testid*="menu" i]
+) {
+  color: var(--ct-text) !important;
+  background: var(--ct-surface-raised) !important;
+  border-color: var(--ct-border) !important;
+  box-shadow: var(--ct-shadow-high) !important;
+}
+
+html.codex-theme :where([role="menuitem"], [role="option"], [role="tab"], button) {
+  color: inherit;
+  border-color: var(--ct-border);
+  border-radius: var(--ct-radius-small);
+}
+
+html.codex-theme :where([role="menuitem"], [role="option"], [role="tab"], button):is(:hover, [data-highlighted], [aria-selected="true"], [data-state="active"]) {
+  color: var(--ct-text) !important;
+  background-color: color-mix(in srgb, var(--ct-accent) 14%, var(--ct-surface-raised)) !important;
+}
+
+html.codex-theme :where(a, [role="link"]) {
+  color: var(--ct-info);
+}
+
+html.codex-theme :where(input, select, textarea, [contenteditable="true"]) {
+  color: var(--ct-text) !important;
+  caret-color: var(--ct-accent);
+  background: var(--ct-surface-raised) !important;
+  border-color: var(--ct-border) !important;
+}
+
+html.codex-theme :where(
+  form:has(textarea),
+  form:has([contenteditable="true"]),
+  [data-testid*="composer" i],
+  [data-testid*="prompt-input" i]
+) {
+  color: var(--ct-text);
+  background: var(--ct-surface-raised) !important;
+  border: 1px solid var(--ct-border) !important;
+  border-radius: var(--ct-radius-large) !important;
+  box-shadow: var(--ct-shadow-low) !important;
+}
+
+html.codex-theme :where(*):focus-visible {
+  outline: 3px solid var(--ct-focus) !important;
+  outline-offset: 2px !important;
+}
+
+/* Dense work surfaces stay opaque, including on translucent themes. */
+html.codex-theme :where(
+  pre,
+  [data-language],
+  [data-testid*="code" i],
+  [data-testid*="editor" i]
+) {
+  color: var(--ct-text) !important;
+  background: var(--ct-code-surface) !important;
+  border-color: var(--ct-border) !important;
+  backdrop-filter: none !important;
+}
+
+html.codex-theme :where(code:not(pre code)) {
+  color: var(--ct-text) !important;
+  background: var(--ct-code-surface) !important;
+  border-radius: var(--ct-radius-small);
+}
+
+html.codex-theme :where(.xterm, [data-testid*="terminal" i], [class*="terminal" i]) {
+  color: #f4f7f8 !important;
+  background: var(--ct-terminal-surface) !important;
+  border-color: var(--ct-border) !important;
+  backdrop-filter: none !important;
+}
+
+html.codex-theme :where(
+  [data-testid*="diff" i],
+  [class*="diff-view" i],
+  [class*="patch-view" i]
+) {
+  color: var(--ct-text) !important;
+  background: var(--ct-code-surface) !important;
+  border-color: var(--ct-border) !important;
+  backdrop-filter: none !important;
+}
+
+html.codex-theme :where([data-testid*="addition" i], [class*="diff-add" i], [class*="inserted" i]) {
+  color: var(--ct-text) !important;
+  background: var(--ct-diff-add-surface) !important;
+}
+
+html.codex-theme :where([data-testid*="deletion" i], [class*="diff-remove" i], [class*="deleted" i]) {
+  color: var(--ct-text) !important;
+  background: var(--ct-diff-remove-surface) !important;
+}
+
+html.codex-theme :where([data-testid*="approval" i], [data-testid*="permission" i], [aria-label*="approval" i]) {
+  color: var(--ct-text) !important;
+  background: var(--ct-approval-surface) !important;
+  border-color: var(--ct-warning) !important;
+  backdrop-filter: none !important;
+}
+
+html.codex-theme :where([role="alert"], [aria-invalid="true"], [data-testid*="error" i]) {
+  color: var(--ct-danger) !important;
+  background: color-mix(in srgb, var(--ct-danger) 10%, var(--ct-surface)) !important;
+  border-color: var(--ct-danger) !important;
+  backdrop-filter: none !important;
+}
+
+html.codex-theme :where([data-status="success"], [data-testid*="success" i]) { color: var(--ct-success) !important; }
+html.codex-theme :where([data-status="warning"], [data-testid*="warning" i]) { color: var(--ct-warning) !important; }
+html.codex-theme :where([data-status="error"], [data-testid*="danger" i]) { color: var(--ct-danger) !important; }
+
+html.codex-theme[data-codex-theme="ink-ivory"] :where(main, [role="main"]) {
+  background-image: linear-gradient(90deg, transparent 0, transparent 31px, color-mix(in srgb, var(--ct-accent) 9%, transparent) 32px, transparent 33px);
+}
+
+html.codex-theme[data-codex-theme="ink-ivory"] :where(h1, h2) {
+  letter-spacing: -.025em;
+}
+
+html.codex-theme[data-codex-theme="paper-workshop"] body {
+  background-image:
+    linear-gradient(rgba(255, 248, 234, .84), rgba(239, 227, 207, .90)),
+    var(--ct-user-art, none),
+    repeating-linear-gradient(7deg, rgba(104, 81, 46, .035) 0 1px, transparent 1px 5px);
+}
+
+html.codex-theme[data-codex-theme="paper-workshop"] :where(main, aside, nav, [role="main"], [role="complementary"]) {
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(185, 85, 61, .06) 0 2px, transparent 3px),
+    repeating-linear-gradient(8deg, rgba(104, 81, 46, .025) 0 1px, transparent 1px 6px);
+}
+
+html.codex-theme[data-codex-theme="neon-workshop"] body {
+  background-image:
+    linear-gradient(rgba(79, 209, 197, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 140, 255, .03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+html.codex-theme[data-codex-theme="neon-workshop"] :where(*):focus-visible {
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--ct-focus) 20%, transparent);
+}
+
+html.codex-theme[data-codex-theme="expressive-signal"] :where(
+  [role="dialog"], [role="menu"], [role="listbox"],
+  form:has(textarea), form:has([contenteditable="true"])
+) {
+  border: 2px solid var(--ct-border) !important;
+}
+
+html.codex-theme[data-codex-theme="expressive-signal"] :where(button, [role="tab"])[aria-selected="true"] {
+  color: var(--ct-accent-text) !important;
+  background: var(--ct-accent) !important;
+  box-shadow: 2px 2px 0 var(--ct-border) !important;
+}
+
+/* Glass is intentionally limited to transient chrome and the composer. */
+html.codex-theme[data-codex-theme="liquid-focus"] :where(
+  header,
+  [data-testid*="header" i],
+  [data-testid*="toolbar" i],
+  [role="menu"],
+  [role="listbox"],
+  [data-testid*="popover" i],
+  form:has(textarea),
+  form:has([contenteditable="true"]),
+  [data-testid*="composer" i]
+) {
+  background: color-mix(in srgb, var(--ct-surface-raised) 76%, transparent) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  backdrop-filter: blur(18px) saturate(125%);
+}
+
+html.codex-theme[data-codex-theme="soft-tactile"] :where(
+  button:not([role="tab"]),
+  [data-testid*="suggestion" i],
+  [data-testid*="home-card" i]
+) {
+  background: var(--ct-surface) !important;
+  border: 1px solid color-mix(in srgb, var(--ct-border) 70%, transparent) !important;
+  box-shadow: var(--ct-shadow-low) !important;
+}
+
+html.codex-theme[data-codex-theme="soft-tactile"] :where(button:not([role="tab"])):active {
+  box-shadow: inset 2px 2px 5px #aab4c0, inset -2px -2px 5px #ffffff !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.codex-theme *,
+  html.codex-theme *::before,
+  html.codex-theme *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  html.codex-theme { --ct-border: currentColor; }
+  html.codex-theme :where(button, input, select, textarea, [contenteditable="true"], [role="dialog"], [role="menu"]) {
+    border: 2px solid currentColor !important;
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  html.codex-theme body { background-image: none !important; }
+  html.codex-theme :where(header, [role="menu"], [role="listbox"], form:has(textarea), form:has([contenteditable="true"])) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: var(--ct-surface-raised) !important;
+    box-shadow: none !important;
+  }
+  html.codex-theme[data-codex-theme="soft-tactile"] :where(button, [data-testid*="suggestion" i], [data-testid*="home-card" i]) {
+    box-shadow: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  html.codex-theme,
+  html.codex-theme body,
+  html.codex-theme :where(main, aside, nav, header, footer, [role="main"], [role="complementary"], [role="dialog"], [role="menu"], [role="listbox"]) {
+    color: CanvasText !important;
+    background: Canvas !important;
+    border-color: CanvasText !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html.codex-theme :where(*):focus-visible { outline-color: Highlight !important; }
+}
