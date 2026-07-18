@@ -1,4 +1,4 @@
 interface:
-  display_name: "Customize Codex Theme"
-  short_description: "Design, try, switch, and restore Codex desktop themes"
-  default_prompt: "Use $customize-codex-theme to design or safely try a Codex desktop theme without restarting until I approve."
+  display_name: "Codex 主题定制"
+  short_description: "设计、试用、切换并安全恢复 Codex 桌面主题"
+  default_prompt: "使用 $customize-codex-theme 先只读检查环境，并默认用简体中文提供定制入口；在我明确授权前不要重启 Codex。"

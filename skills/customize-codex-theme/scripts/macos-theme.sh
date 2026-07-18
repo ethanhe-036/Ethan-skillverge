@@ -31,9 +31,27 @@ STATE_PATH="$STATE_ROOT/theme-state.json"
 RUNTIME_PATH="$STATE_ROOT/runtime.json"
 INJECTOR_LOG="$STATE_ROOT/injector.log"
 INJECTOR_ERROR_LOG="$STATE_ROOT/injector-error.log"
+START_LOCK="$STATE_ROOT/start.lock"
+START_LOCK_OWNER="$START_LOCK/owner"
+START_LOCK_HELD="false"
 EXPECTED_TEAM_ID="2DC432GLL2"
+DOCTOR_NODE_PHASE="false"
 
-fail() { printf 'Codex Theme Studio: %s\n' "$*" >&2; exit 1; }
+json_escape() {
+  local value="$1"
+  value="${value//\\/\\\\}"; value="${value//\"/\\\"}"
+  printf '%s' "$value"
+}
+
+fail() {
+  if [ "$ACTION" = "doctor" ] && [ "$DOCTOR_NODE_PHASE" = "true" ]; then
+    printf '{"pass":false,"status":"NOT_READY","platform":"macOS","codexVersion":"%s","codexPath":"%s","nodeVersion":null,"nodeRuntime":{"status":"NOT_READY","required":"Node.js 20+ with built-in WebSocket","source":null,"path":null,"version":null,"webSocket":false,"reason":"%s"}}\n' \
+      "$(json_escape "$CODEX_VERSION")" "$(json_escape "$CODEX_EXE")" "$(json_escape "$*")"
+    exit 1
+  fi
+  printf 'Codex Theme Studio: %s\n' "$*" >&2
+  exit 1
+}
 
 discover_codex() {
   local candidate identifier executable
@@ -80,6 +98,57 @@ resolve_node() {
 
 ensure_runtime() { discover_codex; resolve_node; }
 ensure_state_root() { /bin/mkdir -p "$STATE_ROOT"; /bin/chmod 700 "$STATE_ROOT"; }
+
+release_start_lock() {
+  [ "$START_LOCK_HELD" = "true" ] || return 0
+  /bin/rm -f "$START_LOCK_OWNER"
+  /bin/rmdir "$START_LOCK" 2>/dev/null || true
+  START_LOCK_HELD="false"
+}
+
+lock_age() {
+  local modified now
+  modified="$(/usr/bin/stat -f %m "$START_LOCK" 2>/dev/null || printf '0')"
+  now="$(/bin/date +%s)"
+  printf '%s\n' "$((now - modified))"
+}
+
+acquire_start_lock() {
+  local owner_pid="" owner_start="" owner_script="" actual_start="" command="" age="0"
+  ensure_state_root
+  if ! /bin/mkdir "$START_LOCK" 2>/dev/null; then
+    age="$(lock_age)"
+    if [ -f "$START_LOCK_OWNER" ]; then
+      owner_pid="$(/usr/bin/sed -n '1p' "$START_LOCK_OWNER" 2>/dev/null || true)"
+      owner_start="$(/usr/bin/sed -n '2p' "$START_LOCK_OWNER" 2>/dev/null || true)"
+      owner_script="$(/usr/bin/sed -n '3p' "$START_LOCK_OWNER" 2>/dev/null || true)"
+    fi
+    case "$owner_pid" in
+      ''|*[!0-9]*) ;;
+      *)
+        if /bin/kill -0 "$owner_pid" 2>/dev/null; then
+          actual_start="$(process_started_at "$owner_pid")"
+          command="$(/bin/ps -p "$owner_pid" -o command= 2>/dev/null || true)"
+          if [ "$owner_start" = "$actual_start" ] && [ "$owner_script" = "$SCRIPT_DIR/macos-theme.sh" ]; then
+            case "$command" in *"$owner_script"*' start'*) fail 'Another Codex Themes start is already in progress; refusing a duplicate launch.' ;; esac
+          fi
+        fi
+        ;;
+    esac
+    [ "$age" -ge 30 ] || fail 'A Codex Themes start lock is still initializing; retry after 30 seconds.'
+    /bin/rm -f "$START_LOCK_OWNER"
+    /bin/rmdir "$START_LOCK" 2>/dev/null || fail 'Could not reclaim a stale start lock safely.'
+    /bin/mkdir "$START_LOCK" || fail 'Could not acquire the Codex Themes start lock.'
+  fi
+  owner_start="$(process_started_at "$$")"
+  [ -n "$owner_start" ] || fail 'Could not record the start-lock process identity.'
+  printf '%s\n%s\n%s\n' "$$" "$owner_start" "$SCRIPT_DIR/macos-theme.sh" > "$START_LOCK_OWNER"
+  /bin/chmod 600 "$START_LOCK_OWNER"
+  START_LOCK_HELD="true"
+  trap release_start_lock EXIT
+  trap 'exit 130' INT
+  trap 'exit 143' HUP TERM
+}
 
 json_field() {
   printf '%s' "$1" | "$NODE" -e '
@@ -196,13 +265,33 @@ create_launchers() {
   printf 'Created Codex Themes.command and Codex Original.command. Fully exit Codex before using Original.\n'
 }
 
-ensure_runtime
+if [ "$ACTION" = "doctor" ]; then
+  discover_codex
+  DOCTOR_NODE_PHASE="true"
+  resolve_node
+  DOCTOR_NODE_PHASE="false"
+else
+  ensure_runtime
+fi
 
 case "$ACTION" in
   doctor)
     "$NODE" "$THEME_TOOL" validate --catalog "$CATALOG" >/dev/null
-    "$NODE" -e 'console.log(JSON.stringify({pass:true,platform:"macOS",codexVersion:process.argv[1],codexPath:process.argv[2],nodeVersion:process.argv[3],stateRoot:process.argv[4]},null,2))' \
-      "$CODEX_VERSION" "$CODEX_EXE" "$NODE_VERSION" "$STATE_ROOT"
+    running_pids="$(codex_pids | /usr/bin/awk 'NF { value = value ? value "," $1 : $1 } END { print value }')"
+    verified_cdp_state="false"; verified_cdp "$PORT" && verified_cdp_state="true"
+    theme_state="$("$NODE" "$THEME_TOOL" status --state "$STATE_PATH")"
+    themes_launcher="$HOME/Desktop/Codex Themes.command"
+    original_launcher="$HOME/Desktop/Codex Original.command"
+    themes_exists="false"; [ -f "$themes_launcher" ] && themes_exists="true"
+    original_exists="false"; [ -f "$original_launcher" ] && original_exists="true"
+    "$NODE" -e '
+      const [version,codexPath,nodeVersion,nodePath,stateRoot,pids,verified,themeState,themes,themesExists,original,originalExists]=process.argv.slice(1);
+      console.log(JSON.stringify({pass:true,status:"READY",platform:"macOS",codexVersion:version,codexPath,nodeVersion,
+        nodeRuntime:{status:"READY",required:"Node.js 20+ with built-in WebSocket",source:"Codex bundled",path:nodePath,version:nodeVersion,webSocket:true},stateRoot,
+        runningPids:pids?pids.split(",").map(Number):[],verifiedCdp:verified==="true",themeState:JSON.parse(themeState),
+        launchers:[{path:themes,exists:themesExists==="true"},{path:original,exists:originalExists==="true"}]},null,2));
+    ' "$CODEX_VERSION" "$CODEX_EXE" "$NODE_VERSION" "$NODE" "$STATE_ROOT" "$running_pids" "$verified_cdp_state" "$theme_state" \
+      "$themes_launcher" "$themes_exists" "$original_launcher" "$original_exists"
     ;;
 
   prepare|switch)
@@ -214,6 +303,7 @@ case "$ACTION" in
 
   start)
     [ "$AUTHORIZED_RESTART" = "true" ] || fail 'start requires --authorized-restart after explicit current-turn authorization, or a deliberate Codex Themes launcher click.'
+    acquire_start_lock
     resolve_selected_theme false
     "$NODE" "$INJECTOR" check --theme-dir "$THEME_DIR"
     if codex_is_running; then

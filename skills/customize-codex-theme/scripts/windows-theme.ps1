@@ -34,29 +34,48 @@ function Get-CodexInstall {
   if (-not $resolved.StartsWith($root, [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Codex executable resolved outside its signed package directory.'
   }
-  [pscustomobject]@{ Package = $package; Exe = $resolved; Root = $root.TrimEnd('\') }
+  $manifest = Get-AppxPackageManifest -Package $package.PackageFullName
+  $application = @($manifest.Package.Applications.Application) |
+    Where-Object { [string]$_.Executable -match '(?:^|[/\\])ChatGPT\.exe$' } |
+    Select-Object -First 1
+  if (-not $application.Id) { throw 'Could not resolve the stable Codex application ID.' }
+  [pscustomobject]@{
+    Package = $package
+    Exe = $resolved
+    Root = $root.TrimEnd('\')
+    AppId = "$($package.PackageFamilyName)!$($application.Id)"
+  }
 }
 
-function Get-Node([object]$CodexInstall = $null) {
-  $candidates = [Collections.Generic.List[string]]::new()
-  if ($env:CODEX_THEME_NODE) { $candidates.Add($env:CODEX_THEME_NODE) }
+function Get-Node([object]$CodexInstall = $null, [switch]$AllowMissing) {
+  $candidates = [Collections.Generic.List[object]]::new()
+  if ($env:CODEX_THEME_NODE) {
+    $candidates.Add([pscustomobject]@{ Path = $env:CODEX_THEME_NODE; Source = 'CODEX_THEME_NODE' })
+  }
   if ($CodexInstall) {
-    $candidates.Add((Join-Path $CodexInstall.Root 'app\resources\cua_node\bin\node.exe'))
-    $candidates.Add((Join-Path $CodexInstall.Root 'app\resources\node.exe'))
+    $candidates.Add([pscustomobject]@{ Path = (Join-Path $CodexInstall.Root 'app\resources\cua_node\bin\node.exe'); Source = 'Codex bundled' })
+    $candidates.Add([pscustomobject]@{ Path = (Join-Path $CodexInstall.Root 'app\resources\node.exe'); Source = 'Codex bundled' })
   }
   $pathNode = Get-Command node -ErrorAction SilentlyContinue
-  if ($pathNode) { $candidates.Add($pathNode.Source) }
+  if ($pathNode) { $candidates.Add([pscustomobject]@{ Path = $pathNode.Source; Source = 'PATH' }) }
 
   foreach ($candidate in $candidates) {
-    if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { continue }
+    if (-not (Test-Path -LiteralPath $candidate.Path -PathType Leaf)) { continue }
     try {
-      $version = (& $candidate --version 2>$null | Select-Object -First 1)
+      $version = (& $candidate.Path --version 2>$null | Select-Object -First 1)
       if ($LASTEXITCODE -ne 0 -or $version -notmatch '^v(\d+)\.' -or [int]$Matches[1] -lt 20) { continue }
-      & $candidate -e 'if(typeof globalThis.WebSocket!=="function")process.exit(1)' 2>$null
+      & $candidate.Path -e 'if(typeof globalThis.WebSocket!=="function")process.exit(1)' 2>$null
       if ($LASTEXITCODE -ne 0) { continue }
-      return [pscustomobject]@{ Path = (Resolve-Path -LiteralPath $candidate).Path; Version = $version }
+      return [pscustomobject]@{
+        Path = (Resolve-Path -LiteralPath $candidate.Path).Path
+        Version = $version
+        Source = $candidate.Source
+        Status = 'READY'
+        WebSocket = $true
+      }
     } catch { continue }
   }
+  if ($AllowMissing) { return $null }
   throw 'A Node.js 20+ runtime with built-in WebSocket support is required. Set CODEX_THEME_NODE to a trusted runtime.'
 }
 
@@ -88,6 +107,29 @@ function Get-CodexProcesses([object]$Install) {
   @(Get-Process -Name ChatGPT -ErrorAction SilentlyContinue | Where-Object {
     try { $_.Path -and ([IO.Path]::GetFullPath($_.Path) -eq $Install.Exe) } catch { $false }
   })
+}
+
+function Get-DesktopLauncherStatus {
+  $desktop = [Environment]::GetFolderPath('Desktop')
+  if (-not $desktop) { return @() }
+  $shell = New-Object -ComObject WScript.Shell
+  @('Codex Themes.lnk', 'Codex Original.lnk') | ForEach-Object {
+    $path = Join-Path $desktop $_
+    if (Test-Path -LiteralPath $path -PathType Leaf) {
+      $shortcut = $shell.CreateShortcut($path)
+      $iconPath = ([string]$shortcut.IconLocation -replace ',\s*-?\d+$', '').Trim('"')
+      [pscustomobject]@{
+        path = $path
+        owner = (Get-Acl -LiteralPath $path).Owner
+        target = $shortcut.TargetPath
+        arguments = $shortcut.Arguments
+        workingDirectory = $shortcut.WorkingDirectory
+        iconLocation = $shortcut.IconLocation
+        targetExists = [bool](Test-Path -LiteralPath $shortcut.TargetPath -PathType Leaf)
+        iconExists = [bool]($iconPath -and (Test-Path -LiteralPath $iconPath -PathType Leaf))
+      }
+    }
+  }
 }
 
 function Test-VerifiedCdp([int]$CandidatePort, [object]$Install) {
@@ -161,17 +203,26 @@ function New-DesktopLaunchers([object]$Install) {
   if ((Test-Path -LiteralPath $themesPath) -or (Test-Path -LiteralPath $originalPath)) {
     throw 'A Codex Themes or Codex Original desktop shortcut already exists; refusing to overwrite it.'
   }
+  $iconSource = Join-Path $Install.Root 'app\resources\icon-chatgpt.ico'
+  if (-not (Test-Path -LiteralPath $iconSource -PathType Leaf)) {
+    throw "Official Codex icon not found: $iconSource"
+  }
+  New-Item -ItemType Directory -Force -Path $StateRoot | Out-Null
+  $stableIcon = Join-Path $StateRoot 'codex.ico'
+  Copy-Item -LiteralPath $iconSource -Destination $stableIcon -Force
+
   $themes = $shell.CreateShortcut($themesPath)
   $themes.TargetPath = $powerShell
   $themes.Arguments = "-NoProfile -File `"$PSCommandPath`" -Action start -Port $Port -AuthorizedRestart"
   $themes.WorkingDirectory = $ScriptRoot
-  $themes.IconLocation = "$($Install.Exe),0"
+  $themes.IconLocation = "$stableIcon,0"
   $themes.Save()
 
   $original = $shell.CreateShortcut($originalPath)
-  $original.TargetPath = $Install.Exe
-  $original.WorkingDirectory = Split-Path -Parent $Install.Exe
-  $original.IconLocation = "$($Install.Exe),0"
+  $original.TargetPath = (Get-Command explorer.exe -ErrorAction Stop).Source
+  $original.Arguments = "shell:AppsFolder\$($Install.AppId)"
+  $original.WorkingDirectory = $desktop
+  $original.IconLocation = "$stableIcon,0"
   $original.Save()
   Write-Host 'Created Codex Themes and Codex Original. Fully exit Codex before using Original.'
 }
@@ -182,16 +233,55 @@ $nodeInfo = $null
 switch ($Action) {
   'doctor' {
     $install = Get-CodexInstall
-    $nodeInfo = Get-Node $install
+    $nodeInfo = Get-Node $install -AllowMissing
+    if (-not $nodeInfo) {
+      [pscustomobject]@{
+        pass = $false
+        status = 'NOT_READY'
+        platform = 'Windows'
+        codexVersion = [string]$install.Package.Version
+        codexPath = $install.Exe
+        nodeVersion = $null
+        nodeRuntime = [ordered]@{
+          status = 'NOT_READY'
+          required = 'Node.js 20+ with built-in WebSocket'
+          source = $null
+          path = $null
+          version = $null
+          webSocket = $false
+          reason = 'No trusted compatible Node.js runtime was found.'
+        }
+        stateRoot = $StateRoot
+        runningPids = @((Get-CodexProcesses $install) | ForEach-Object Id)
+        verifiedCdp = [bool](Test-VerifiedCdp $Port $install)
+        themeState = $null
+        launchers = @(Get-DesktopLauncherStatus)
+      } | ConvertTo-Json -Depth 6
+      break
+    }
     $catalogResult = Invoke-NodeJson $nodeInfo.Path $ThemeTool @('validate', '--catalog', $Catalog)
+    $themeState = Get-ThemeStatus $nodeInfo.Path
     [pscustomobject]@{
       pass = [bool]$catalogResult.pass
+      status = 'READY'
       platform = 'Windows'
       codexVersion = [string]$install.Package.Version
       codexPath = $install.Exe
       nodeVersion = $nodeInfo.Version
+      nodeRuntime = [ordered]@{
+        status = $nodeInfo.Status
+        required = 'Node.js 20+ with built-in WebSocket'
+        source = $nodeInfo.Source
+        path = $nodeInfo.Path
+        version = $nodeInfo.Version
+        webSocket = $nodeInfo.WebSocket
+      }
       stateRoot = $StateRoot
-    } | ConvertTo-Json
+      runningPids = @((Get-CodexProcesses $install) | ForEach-Object Id)
+      verifiedCdp = [bool](Test-VerifiedCdp $Port $install)
+      themeState = $themeState
+      launchers = @(Get-DesktopLauncherStatus)
+    } | ConvertTo-Json -Depth 6
   }
 
   { $_ -in @('prepare', 'switch') } {
@@ -206,6 +296,13 @@ switch ($Action) {
 
   'start' {
     if (-not $AuthorizedRestart) { throw 'start requires -AuthorizedRestart after explicit current-turn authorization, or a deliberate Codex Themes launcher click.' }
+    $userSid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value.Replace('-', '_')
+    $startMutex = [Threading.Mutex]::new($false, "Global\CodexThemeStudio.Start.$userSid")
+    $startLockTaken = $false
+    try {
+      try { $startLockTaken = $startMutex.WaitOne(0) }
+      catch [Threading.AbandonedMutexException] { $startLockTaken = $true }
+      if (-not $startLockTaken) { throw 'Another Codex Themes start is already in progress; refusing a duplicate launch.' }
     $install = Get-CodexInstall
     $nodeInfo = Get-Node $install
     $resolved = Resolve-SelectedTheme $nodeInfo.Path
@@ -251,6 +348,10 @@ switch ($Action) {
     Write-Runtime $watcher $nodeInfo.Path $resolved
     & $nodeInfo.Path $ThemeTool mark-loaded --state $StatePath --theme $resolved.id --hash $resolved.hash
     if ($LASTEXITCODE -ne 0) { Stop-RecordedInjector; throw 'Could not record the loaded theme.' }
+    } finally {
+      if ($startLockTaken) { $startMutex.ReleaseMutex() }
+      $startMutex.Dispose()
+    }
   }
 
   'verify' {
