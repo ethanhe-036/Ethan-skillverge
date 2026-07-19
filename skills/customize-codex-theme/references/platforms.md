@@ -18,6 +18,14 @@ Both adapters expose these actions:
 
 Never mark a theme loaded until `verify` succeeds. Write state through `scripts/theme-tool.mjs`, which performs validation and atomic replacement.
 
+Every `start` is serialized with a per-user lock or equivalent single-flight guard. Windows uses a cross-session named mutex scoped by the current user SID. macOS records PID, process start time, and script command; it reclaims a mismatched/dead or incomplete lock only after a 30-second initialization window. A duplicate launcher click or second launch must refuse; it must not create another Codex process or injector. If the configured port has an unknown or mismatched owner, report `NOT_READY` and refuse to reuse, stop, or automatically replace that listener. Do not select a different port unless the adapter atomically propagates it to state, runtime records, and launchers.
+
+## Skill package deployment
+
+For maintainer deployment, the validated repository package is the canonical Skill source; never choose files by timestamp or merge two copies. Validation means the contract test, preset validation, and platform-script syntax checks all pass.
+
+Build the recursive SHA-256 manifest from every regular file with no exclusions: reject symlinks, normalize relative paths to forward slashes, sort paths by ordinal value, and hash file bytes. Install the whole package through a sibling staging directory: validate staging, rename the existing target to backup, atomically rename staging to the target, compare manifests, and restore the backup on any failure. Delete the backup only after the installed manifest matches. Any missing, extra, or changed file is `NOT_READY`; do not publish, run, or describe that installed copy as current.
+
 ## Windows
 
 Call `scripts/windows-theme.ps1 -Action <doctor|prepare|start|verify|switch|restore|status>` with the required action-specific arguments. Pass `-AuthorizedRestart` to `start` only after current-turn authorization; the user clicking **Codex Themes** is itself a deliberate launch action. Resolve Store/MSIX and installed Codex paths dynamically; do not hard-code a package version. Discover a usable Node runtime without downloading software or altering `PATH` silently.
@@ -32,9 +40,11 @@ For a themed launch:
 Create shortcuts only on request:
 
 - **Codex Themes** invokes the adapter's safe start action and uses `nextLaunchTheme`.
-- **Codex Original** invokes the discovered official Codex entry without debugging flags or injection.
+- **Codex Original** invokes the stable AppsFolder application ID (`explorer.exe shell:AppsFolder/<AUMID>`) without debugging flags or injection.
 
-Use unique names. Do not overwrite `Codex.lnk`, taskbar pins, Start-menu entries, or user-managed shortcuts. If Windows blocks graceful closure, stop and request a manual exit; do not use `Stop-Process -Name ChatGPT` or `Stop-Process -Name Codex`.
+Copy the current signed-package icon to a stable per-user file such as `%LOCALAPPDATA%/CodexThemeStudio/codex.ico`, then point both theme-owned shortcuts at that copy. Never store a versioned `WindowsApps` executable in a shortcut target or `IconLocation`; Store updates remove old package directories. The themed shortcut must invoke the adapter, which resolves the current package dynamically on every launch.
+
+Use unique names. Before editing an existing `.lnk`, verify its path, owner, target, arguments, working directory, and description prove it is theme-owned; otherwise refuse. After saving, read those fields back and confirm only the intended values changed. Do not overwrite `Codex.lnk`, taskbar pins, Start-menu entries, Public Desktop entries, or user-managed shortcuts. The official/taskbar entry remains native and does not inherit the theme. If Windows blocks graceful closure, stop and request a manual exit; do not use `Stop-Process -Name ChatGPT` or `Stop-Process -Name Codex`.
 
 ## macOS
 
