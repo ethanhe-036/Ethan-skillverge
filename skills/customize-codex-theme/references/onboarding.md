@@ -35,6 +35,6 @@
 若没有可信的 Node.js 20+ 运行时，或缺少内置 WebSocket，输出 `NOT_READY`，报告已发现的操作系统、Codex、Node.js 失败原因及其余可确认状态，并明确本次未修改、未安装、未重启。
 
 - 不得静默或自动安装，也不得先安装再征求同意。
-- Windows：说明通常会优先复用 Codex 内置 Node.js；确实缺失时，只有获得用户当前轮明确授权，才从官方来源安装 Node.js LTS。安装前说明来源、版本、安装范围、`PATH` 与管理员权限影响；安装后重跑版本和 WebSocket 校验。
+- Windows：`doctor` 报告“没有可信运行时”不等于系统没有 Node.js。先只读解析现有 `node.exe` 的绝对路径，验证版本为 20+ 且内置 `WebSocket` 可用；若适配器支持 `CODEX_THEME_NODE`，仅为当前命令临时指定该已验证路径并重跑 `doctor`，不得持久化环境变量或修改 `PATH`。确实缺失时，只有获得用户当前轮明确授权，才从官方来源安装 Node.js LTS。安装前说明来源、版本、安装范围、`PATH` 与管理员权限影响；安装后重跑版本和 WebSocket 校验。
 - macOS：主题适配器只信任 Codex 内置且签名匹配的 Node.js。缺失或签名/兼容性失败时，优先修复、更新或重新安装官方 Codex；不得用 Homebrew 或系统 Node 绕过签名校验。
 - 用户拒绝安装或修复时保持 `NOT_READY`，不继续准备或应用主题。

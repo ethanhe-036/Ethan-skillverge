@@ -44,7 +44,9 @@ Create shortcuts only on request:
 
 Copy the current signed-package icon to a stable per-user file such as `%LOCALAPPDATA%/CodexThemeStudio/codex.ico`, then point both theme-owned shortcuts at that copy. Never store a versioned `WindowsApps` executable in a shortcut target or `IconLocation`; Store updates remove old package directories. The themed shortcut must invoke the adapter, which resolves the current package dynamically on every launch.
 
-Use unique names. Before editing an existing `.lnk`, verify its path, owner, target, arguments, working directory, and description prove it is theme-owned; otherwise refuse. After saving, read those fields back and confirm only the intended values changed. Do not overwrite `Codex.lnk`, taskbar pins, Start-menu entries, Public Desktop entries, or user-managed shortcuts. The official/taskbar entry remains native and does not inherit the theme. If Windows blocks graceful closure, stop and request a manual exit; do not use `Stop-Process -Name ChatGPT` or `Stop-Process -Name Codex`.
+Use unique names. Before editing an existing `.lnk`, verify its path, owner, target, arguments, working directory, and description prove it is theme-owned; otherwise refuse. After saving, read those fields back and confirm only the intended values changed. Do not overwrite `Codex.lnk`, taskbar pins, Start-menu entries, Public Desktop entries, or user-managed shortcuts. The official/taskbar entry remains native and does not inherit the theme.
+
+For a current-turn authorized Windows restart, prefer graceful close and condition-wait. An adapter may force-stop only the exact Store Codex PIDs it captured before closing, after re-verifying each executable path and process identity immediately before termination; then it must wait for those PIDs and their listener to disappear before launching. Never use `Stop-Process -Name ChatGPT`, `Stop-Process -Name Codex`, or a newly discovered PID. If the adapter does not implement this exact-PID guard, stop and request a manual exit instead of improvising.
 
 ## macOS
 
