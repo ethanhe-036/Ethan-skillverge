@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "contractId": "codex-theme-trust-policy",
+  "registry": {
+    "allowedTiers": ["builtin", "local-private", "external"],
+    "allowedDistribution": ["redistributable", "excluded"],
+    "canonicalTrustBasis": "recursive-package-hash-and-runtime-contract"
+  },
+  "externalPackages": {
+    "signatureRequired": true,
+    "algorithm": "ed25519",
+    "signatureFile": "theme.signature.json",
+    "defaultTrust": "untrusted"
+  },
+  "assets": {
+    "remoteResources": "forbidden",
+    "allowedExtensions": [".css", ".json", ".md", ".png", ".jpg", ".jpeg", ".webp"],
+    "maximumFileBytes": 16777216,
+    "maximumPackageBytes": 50331648,
+    "maximumFiles": 32,
+    "maximumDepth": 4,
+    "maximumDimension": 16384,
+    "maximumPixels": 50000000,
+    "licenseRequired": true,
+    "provenanceRequired": true,
+    "localPrivateDistribution": "excluded"
+  }
+}

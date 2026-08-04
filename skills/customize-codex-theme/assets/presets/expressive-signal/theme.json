@@ -8,6 +8,37 @@
     "license": "MIT",
     "provenance": "Original CSS-only preset; no third-party imagery."
   },
+  "aestheticProfile": {
+    "designThesis": "An editorial signal board where bold blocks clarify action priority without becoming a dashboard.",
+    "moodKeywords": ["graphic", "decisive", "editorial"],
+    "signatureMotif": "blue-amber signal blocks",
+    "antiGoals": ["rainbow dashboard", "equal emphasis everywhere", "decorative control geometry"],
+    "paletteStrategy": "expressive",
+    "motifBudget": {
+      "dominantMotifs": 1,
+      "secondaryMotifs": 2,
+      "accentAreaPercent": 10
+    }
+  },
+  "compositionProfile": {
+    "primaryFocus": ["composer", "active-task", "selected-navigation"],
+    "secondaryFocus": ["sidebar"],
+    "quietZones": ["main", "code", "terminal", "settings"],
+    "viewportIntent": {
+      "wide": "preserve-hierarchy",
+      "split": "rebalance-focus",
+      "narrow": "reduce-decoration"
+    }
+  },
+  "materialGrammar": {
+    "canvas": "matte-canvas",
+    "navigation": "editorial-panel",
+    "controls": "signal-block",
+    "reading": "opaque-paper",
+    "transient": "signal-block",
+    "elevationLevels": 2,
+    "lightingDirection": "diffuse"
+  },
   "tokens": {
     "canvas": "#f6f2e8",
     "surface": "#fffdf8",
@@ -24,6 +55,7 @@
     "info": "#285fbd",
     "codeSurface": "#eae5d9",
     "terminalSurface": "#171717",
+    "terminalText": "#f4f7f8",
     "diffAddSurface": "#d5f0dc",
     "diffRemoveSurface": "#f7d7dc",
     "approvalSurface": "#f5ddb0",
@@ -62,5 +94,11 @@
     "glassChrome": false,
     "tactileControls": false,
     "experimental": false
+  },
+  "usability": {
+    "typography": "native",
+    "geometry": "native",
+    "criticalSurfaces": "opaque",
+    "motion": "state-only"
   }
 }

@@ -1,0 +1,76 @@
+/*
+ * Large surfaces use a quiet optical field. The shared runtime owns the
+ * continuous semantic-header material; this pack keeps reading surfaces
+ * opaque and contributes no independent header paint.
+ */
+html.codex-theme[data-codex-theme="liquid-focus"] {
+  --ct-liquid-edge: color-mix(in srgb, var(--ct-focus) 28%, var(--ct-border));
+  --ct-liquid-highlight: color-mix(in srgb, var(--ct-surface-raised) 74%, transparent);
+  --ct-optical-field: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ct-focus) 3%, var(--ct-surface)) 0%,
+    var(--ct-surface) 46%,
+    color-mix(in srgb, var(--ct-info) 2%, var(--ct-surface)) 100%
+  );
+}
+
+html.codex-theme[data-codex-theme="liquid-focus"]
+:where(
+  [data-ct-part~="sidebar"],
+  [data-ct-part~="main"],
+  [data-ct-part~="right-panel"],
+  [data-ct-part~="settings"]
+) {
+  background-color: var(--ct-surface) !important;
+  background-image: var(--ct-optical-field) !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+html.codex-theme[data-codex-theme="liquid-focus"]
+:where(
+  [data-ct-part~="composer"],
+  [data-ct-part~="dialog"],
+  [data-ct-part~="menu"]
+) {
+  background-color: var(--ct-surface-raised) !important;
+  background-image:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--ct-focus) 5%, var(--ct-surface-raised)),
+      var(--ct-surface-raised) 58%
+    ) !important;
+  border-color: var(--ct-liquid-edge) !important;
+  box-shadow:
+    inset 0 1px 0 var(--ct-liquid-highlight),
+    var(--ct-shadow-high) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html.codex-theme[data-codex-theme="liquid-focus"]
+[data-ct-part~="composer"] {
+  box-shadow:
+    inset 0 1px 0 var(--ct-liquid-highlight),
+    var(--ct-shadow-low) !important;
+}
+
+@media (forced-colors: active) {
+  html.codex-theme[data-codex-theme="liquid-focus"]
+  :where(
+    [data-ct-part~="sidebar"],
+    [data-ct-part~="main"],
+    [data-ct-part~="right-panel"],
+    [data-ct-part~="settings"],
+    [data-ct-part~="composer"],
+    [data-ct-part~="dialog"],
+    [data-ct-part~="menu"]
+  ) {
+    color: CanvasText !important;
+    background: Canvas !important;
+    border-color: CanvasText !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

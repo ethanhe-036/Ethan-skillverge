@@ -2,28 +2,60 @@
   "id": "paper-workshop",
   "metadata": {
     "name": "Paper Workshop",
-    "summary": "温暖纸张、手作层次与海蓝/陶红点缀；可叠加用户自有图片。",
-    "description": "温暖纸张、手作层次与海蓝/陶红点缀；可叠加用户自有图片。",
+    "summary": "温暖纸张、手作层次与海蓝/陶红点缀；使用轻量 CSS 纸纹。",
+    "description": "温暖纸张、手作层次与海蓝/陶红点缀；使用轻量 CSS 纸纹。",
     "style": "paper-craft",
     "license": "MIT",
     "provenance": "Original CSS-only preset; no third-party imagery."
+  },
+  "aestheticProfile": {
+    "designThesis": "A practical maker's notebook where crafted paper warmth supports precise technical work.",
+    "moodKeywords": ["handmade", "warm", "practical"],
+    "signatureMotif": "quiet paper-cut edges",
+    "antiGoals": ["scrapbook clutter", "fake torn controls", "texture beneath dense text"],
+    "paletteStrategy": "narrative",
+    "motifBudget": {
+      "dominantMotifs": 1,
+      "secondaryMotifs": 2,
+      "accentAreaPercent": 7
+    }
+  },
+  "compositionProfile": {
+    "primaryFocus": ["composer", "active-task", "selected-navigation"],
+    "secondaryFocus": ["sidebar"],
+    "quietZones": ["main", "code", "terminal", "settings"],
+    "viewportIntent": {
+      "wide": "preserve-hierarchy",
+      "split": "rebalance-focus",
+      "narrow": "reduce-decoration"
+    }
+  },
+  "materialGrammar": {
+    "canvas": "workshop-paper",
+    "navigation": "workshop-paper",
+    "controls": "cut-paper",
+    "reading": "clean-paper",
+    "transient": "cut-paper",
+    "elevationLevels": 3,
+    "lightingDirection": "top-left"
   },
   "tokens": {
     "canvas": "#efe3cf",
     "surface": "#fff8ea",
     "surfaceRaised": "#fffdf5",
     "text": "#2b2923",
-    "muted": "#6f675a",
+    "muted": "#675f53",
     "accent": "#b9553d",
     "accentText": "#ffffff",
     "border": "#c4af8d",
     "focus": "#2f6f86",
-    "success": "#4d7653",
-    "warning": "#9a681b",
-    "danger": "#ad4639",
-    "info": "#3f7084",
+    "success": "#406844",
+    "warning": "#7f520f",
+    "danger": "#a03b33",
+    "info": "#315f70",
     "codeSurface": "#e8dbc4",
     "terminalSurface": "#252a2a",
+    "terminalText": "#f4f7f8",
     "diffAddSurface": "#dce8d4",
     "diffRemoveSurface": "#f0d6cd",
     "approvalSurface": "#f6e3bb",
@@ -38,9 +70,15 @@
   "capabilities": {
     "mode": "light",
     "cssOnly": true,
-    "userArt": true,
+    "userArt": false,
     "glassChrome": false,
     "tactileControls": false,
     "experimental": false
+  },
+  "usability": {
+    "typography": "native",
+    "geometry": "native",
+    "criticalSurfaces": "opaque",
+    "motion": "state-only"
   }
 }

@@ -1,11 +1,79 @@
 {
-  "version": 1,
+  "version": 2,
+  "collections": [
+    {
+      "id": "codex-studio",
+      "name": "Codex Studio",
+      "summary": "Original workbench themes for focused daily use.",
+      "order": 10
+    }
+  ],
   "themes": [
-    { "id": "ink-ivory", "path": "ink-ivory" },
-    { "id": "paper-workshop", "path": "paper-workshop" },
-    { "id": "neon-workshop", "path": "neon-workshop" },
-    { "id": "expressive-signal", "path": "expressive-signal" },
-    { "id": "liquid-focus", "path": "liquid-focus" },
-    { "id": "soft-tactile", "path": "soft-tactile" }
+    {
+      "id": "ink-ivory",
+      "path": "ink-ivory",
+      "collectionId": "codex-studio",
+      "variantLabel": "Ink & Ivory",
+      "trust": {
+        "tier": "builtin",
+        "distribution": "redistributable",
+        "reason": "Original CSS-only MIT preset in the canonical catalog."
+      }
+    },
+    {
+      "id": "paper-workshop",
+      "path": "paper-workshop",
+      "collectionId": "codex-studio",
+      "variantLabel": "Paper Workshop",
+      "trust": {
+        "tier": "builtin",
+        "distribution": "redistributable",
+        "reason": "Original CSS-only MIT preset in the canonical catalog."
+      }
+    },
+    {
+      "id": "neon-workshop",
+      "path": "neon-workshop",
+      "collectionId": "codex-studio",
+      "variantLabel": "Neon Workshop",
+      "trust": {
+        "tier": "builtin",
+        "distribution": "redistributable",
+        "reason": "Original CSS-only MIT preset in the canonical catalog."
+      }
+    },
+    {
+      "id": "expressive-signal",
+      "path": "expressive-signal",
+      "collectionId": "codex-studio",
+      "variantLabel": "Expressive Signal",
+      "trust": {
+        "tier": "builtin",
+        "distribution": "redistributable",
+        "reason": "Original CSS-only MIT preset in the canonical catalog."
+      }
+    },
+    {
+      "id": "liquid-focus",
+      "path": "liquid-focus",
+      "collectionId": "codex-studio",
+      "variantLabel": "Liquid Focus",
+      "trust": {
+        "tier": "builtin",
+        "distribution": "redistributable",
+        "reason": "Original CSS-only MIT preset in the canonical catalog."
+      }
+    },
+    {
+      "id": "soft-tactile",
+      "path": "soft-tactile",
+      "collectionId": "codex-studio",
+      "variantLabel": "Soft Tactile",
+      "trust": {
+        "tier": "builtin",
+        "distribution": "redistributable",
+        "reason": "Original CSS-only MIT preset in the canonical catalog."
+      }
+    }
   ]
 }

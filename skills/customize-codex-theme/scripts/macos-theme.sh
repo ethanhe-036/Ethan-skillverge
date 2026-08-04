@@ -17,7 +17,7 @@ while [ "$#" -gt 0 ]; do
     *) printf 'Unknown argument: %s\n' "$1" >&2; exit 2 ;;
   esac
 done
-case "$ACTION" in doctor|prepare|start|verify|switch|restore|status) ;; *) printf 'Unknown action: %s\n' "$ACTION" >&2; exit 2 ;; esac
+case "$ACTION" in doctor|compatibility-audit|prepare|start|verify|switch|rollback|restore|status) ;; *) printf 'Unknown action: %s\n' "$ACTION" >&2; exit 2 ;; esac
 case "$PORT" in ''|*[!0-9]*) printf 'Invalid port: %s\n' "$PORT" >&2; exit 2 ;; esac
 [ "$PORT" -ge 1024 ] && [ "$PORT" -le 65535 ] || { printf 'Port must be between 1024 and 65535.\n' >&2; exit 2; }
 
@@ -51,6 +51,16 @@ fail() {
   fi
   printf 'Codex Theme Studio: %s\n' "$*" >&2
   exit 1
+}
+
+assert_canonical_skill() {
+  local codex_home_root expected_root resolved_expected
+  codex_home_root="${CODEX_HOME:-$HOME/.codex}"
+  expected_root="$codex_home_root/skills/customize-codex-theme"
+  [ -d "$expected_root" ] || fail "The canonical Skill is missing: $expected_root"
+  resolved_expected="$(cd "$expected_root" && pwd -P)"
+  [ "$SKILL_ROOT" = "$resolved_expected" ] ||
+    fail "This is not the canonical customize-codex-theme installation. Expected: $resolved_expected; actual: $SKILL_ROOT"
 }
 
 discover_codex() {
@@ -130,7 +140,11 @@ acquire_start_lock() {
           actual_start="$(process_started_at "$owner_pid")"
           command="$(/bin/ps -p "$owner_pid" -o command= 2>/dev/null || true)"
           if [ "$owner_start" = "$actual_start" ] && [ "$owner_script" = "$SCRIPT_DIR/macos-theme.sh" ]; then
-            case "$command" in *"$owner_script"*' start'*) fail 'Another Codex Themes start is already in progress; refusing a duplicate launch.' ;; esac
+            case "$command" in
+              *"$owner_script"*' prepare'*|*"$owner_script"*' switch'*|*"$owner_script"*' start'*|*"$owner_script"*' rollback'*|*"$owner_script"*' restore'*)
+                fail 'Another Codex Themes selection, state change, or start is already in progress.'
+                ;;
+            esac
           fi
         fi
         ;;
@@ -158,18 +172,46 @@ json_field() {
   ' "$2"
 }
 
-resolve_selected_theme() {
-  local prefer_loaded="${1:-false}" status
-  status="$($NODE "$THEME_TOOL" status --state "$STATE_PATH")"
-  THEME_ID=""
-  if [ "$prefer_loaded" = "true" ]; then THEME_ID="$(json_field "$status" loadedTheme)"; fi
-  [ -n "$THEME_ID" ] || THEME_ID="$(json_field "$status" nextLaunchTheme)"
-  [ -n "$THEME_ID" ] || THEME_ID="$(json_field "$status" selectedTheme)"
-  [ -n "$THEME_ID" ] || fail 'No theme is selected. Run prepare or switch with --theme first.'
-  RESOLVED_THEME="$($NODE "$THEME_TOOL" resolve --catalog "$CATALOG" --theme "$THEME_ID")"
+codex_compatibility() {
+  "$NODE" "$THEME_TOOL" compatibility --platform macos --codex-version "$CODEX_VERSION"
+}
+
+assert_compatible_codex() {
+  local compatibility status
+  compatibility="$(codex_compatibility)"
+  status="$(json_field "$compatibility" status)"
+  case "$status" in
+    PASS|PARTIAL) ;;
+    *) fail "Codex build $CODEX_VERSION is UNSUPPORTED. Ask this Skill to run its read-only compatibility audit; no launch or injection was attempted." ;;
+  esac
+}
+
+native_compatibility_probe() {
+  verified_cdp "$PORT" || fail 'No verified Codex loopback endpoint is available for the read-only compatibility audit.'
+  "$NODE" "$INJECTOR" compatibility-probe --platform macos \
+    --codex-version "$CODEX_VERSION" --port "$PORT" --timeout-ms 5000
+}
+
+read_resolved_theme() {
   THEME_DIR="$(json_field "$RESOLVED_THEME" directory)"
+  THEME_ID="$(json_field "$RESOLVED_THEME" id)"
   THEME_HASH="$(json_field "$RESOLVED_THEME" hash)"
-  [ -n "$THEME_DIR" ] && [ -n "$THEME_HASH" ] || fail 'Theme resolution returned incomplete data.'
+  [ -n "$THEME_ID" ] && [ -n "$THEME_DIR" ] && [ -n "$THEME_HASH" ] || fail 'Theme resolution returned incomplete data.'
+}
+
+resolve_next_theme() {
+  RESOLVED_THEME="$($NODE "$THEME_TOOL" resolve-next --catalog "$CATALOG" --state "$STATE_PATH")" ||
+    fail 'No nextLaunchTheme is selected. Choose a theme before using Codex Themes.'
+  read_resolved_theme
+}
+
+resolve_loaded_theme() {
+  local status
+  status="$($NODE "$THEME_TOOL" status --state "$STATE_PATH")"
+  THEME_ID="$(json_field "$status" loadedTheme)"
+  [ -n "$THEME_ID" ] || fail 'No verified loadedTheme is recorded.'
+  RESOLVED_THEME="$($NODE "$THEME_TOOL" resolve --catalog "$CATALOG" --theme "$THEME_ID")"
+  read_resolved_theme
 }
 
 codex_pids() {
@@ -242,13 +284,13 @@ stop_recorded_injector() {
 }
 
 write_runtime() {
-  local pid="$1" started="$2"
+  local pid="$1" started="$2" payload_hash="$3"
   "$NODE" -e '
     const fs=require("node:fs");
-    const [file,port,pid,started,injector,node,themeId,themeDir,themeHash]=process.argv.slice(1);
-    const state={schemaVersion:1,port:Number(port),injectorPid:Number(pid),injectorStartedAt:started,injectorPath:injector,nodePath:node,themeId,themeDir,themeHash};
+    const [file,port,pid,started,injector,node,themeId,themeDir,themeHash,payloadHash]=process.argv.slice(1);
+    const state={schemaVersion:2,port:Number(port),injectorPid:Number(pid),injectorStartedAt:started,injectorPath:injector,nodePath:node,themeId,themeDir,themeHash,payloadHash};
     const temporary=`${file}.${process.pid}.tmp`; fs.writeFileSync(temporary,`${JSON.stringify(state,null,2)}\n`,{mode:0o600}); fs.renameSync(temporary,file);
-  ' "$RUNTIME_PATH" "$PORT" "$pid" "$started" "$INJECTOR" "$NODE" "$THEME_ID" "$THEME_DIR" "$THEME_HASH"
+  ' "$RUNTIME_PATH" "$PORT" "$pid" "$started" "$INJECTOR" "$NODE" "$THEME_ID" "$THEME_DIR" "$THEME_HASH" "$payload_hash"
 }
 
 create_launchers() {
@@ -265,6 +307,8 @@ create_launchers() {
   printf 'Created Codex Themes.command and Codex Original.command. Fully exit Codex before using Original.\n'
 }
 
+assert_canonical_skill
+
 if [ "$ACTION" = "doctor" ]; then
   discover_codex
   DOCTOR_NODE_PHASE="true"
@@ -277,25 +321,51 @@ fi
 case "$ACTION" in
   doctor)
     "$NODE" "$THEME_TOOL" validate --catalog "$CATALOG" >/dev/null
+    compatibility="$(codex_compatibility)"
     running_pids="$(codex_pids | /usr/bin/awk 'NF { value = value ? value "," $1 : $1 } END { print value }')"
     verified_cdp_state="false"; verified_cdp "$PORT" && verified_cdp_state="true"
+    live_compatibility_probe="null"
+    if [ "$(json_field "$compatibility" status)" = "UNSUPPORTED" ] && [ "$verified_cdp_state" = "true" ]; then
+      live_compatibility_probe="$(native_compatibility_probe)"
+    fi
     theme_state="$("$NODE" "$THEME_TOOL" status --state "$STATE_PATH")"
     themes_launcher="$HOME/Desktop/Codex Themes.command"
     original_launcher="$HOME/Desktop/Codex Original.command"
     themes_exists="false"; [ -f "$themes_launcher" ] && themes_exists="true"
     original_exists="false"; [ -f "$original_launcher" ] && original_exists="true"
     "$NODE" -e '
-      const [version,codexPath,nodeVersion,nodePath,stateRoot,pids,verified,themeState,themes,themesExists,original,originalExists]=process.argv.slice(1);
+      const [version,codexPath,nodeVersion,nodePath,stateRoot,pids,verified,themeState,compatibility,liveProbe,themes,themesExists,original,originalExists]=process.argv.slice(1);
       console.log(JSON.stringify({pass:true,status:"READY",platform:"macOS",codexVersion:version,codexPath,nodeVersion,
         nodeRuntime:{status:"READY",required:"Node.js 20+ with built-in WebSocket",source:"Codex bundled",path:nodePath,version:nodeVersion,webSocket:true},stateRoot,
-        runningPids:pids?pids.split(",").map(Number):[],verifiedCdp:verified==="true",themeState:JSON.parse(themeState),
+        runningPids:pids?pids.split(",").map(Number):[],verifiedCdp:verified==="true",themeState:JSON.parse(themeState),compatibility:JSON.parse(compatibility),
+        liveCompatibilityProbe:JSON.parse(liveProbe),
         launchers:[{path:themes,exists:themesExists==="true"},{path:original,exists:originalExists==="true"}]},null,2));
-    ' "$CODEX_VERSION" "$CODEX_EXE" "$NODE_VERSION" "$NODE" "$STATE_ROOT" "$running_pids" "$verified_cdp_state" "$theme_state" \
+    ' "$CODEX_VERSION" "$CODEX_EXE" "$NODE_VERSION" "$NODE" "$STATE_ROOT" "$running_pids" "$verified_cdp_state" "$theme_state" "$compatibility" "$live_compatibility_probe" \
       "$themes_launcher" "$themes_exists" "$original_launcher" "$original_exists"
+    ;;
+
+  compatibility-audit)
+    compatibility="$(codex_compatibility)"
+    if verified_cdp "$PORT"; then
+      probe="$(native_compatibility_probe)"
+      "$NODE" -e '
+        const [compatibility,probe]=process.argv.slice(1);
+        const parsed=JSON.parse(probe);
+        console.log(JSON.stringify({pass:parsed.pass,status:parsed.status,mutationPerformed:false,platform:"macOS",
+          compatibility:JSON.parse(compatibility),probe:parsed},null,2));
+      ' "$compatibility" "$probe"
+    else
+      "$NODE" -e '
+        const compatibility=JSON.parse(process.argv[1]);
+        console.log(JSON.stringify({pass:false,status:"NOT_READY",mutationPerformed:false,platform:"macOS",
+          compatibility,reason:"A verified running Codex loopback endpoint is required for the read-only native structure probe."},null,2));
+      ' "$compatibility"
+    fi
     ;;
 
   prepare|switch)
     [ -n "$THEME" ] || fail "$ACTION requires --theme <id>."
+    acquire_start_lock
     ensure_state_root
     "$NODE" "$THEME_TOOL" select --catalog "$CATALOG" --state "$STATE_PATH" --theme "$THEME"
     [ "$CREATE_LAUNCHERS" = "true" ] && create_launchers
@@ -304,8 +374,14 @@ case "$ACTION" in
   start)
     [ "$AUTHORIZED_RESTART" = "true" ] || fail 'start requires --authorized-restart after explicit current-turn authorization, or a deliberate Codex Themes launcher click.'
     acquire_start_lock
-    resolve_selected_theme false
-    "$NODE" "$INJECTOR" check --theme-dir "$THEME_DIR"
+    assert_compatible_codex
+    resolve_next_theme
+    if ! CHECK_RESULT="$("$NODE" "$INJECTOR" check --theme-dir "$THEME_DIR")"; then
+      fail 'Theme payload validation failed.'
+    fi
+    PAYLOAD_HASH="$(json_field "$CHECK_RESULT" payloadHash)"
+    case "$PAYLOAD_HASH" in ''|*[!0-9a-f]*) fail 'Theme payload validation returned an invalid payload hash.' ;; esac
+    [ "${#PAYLOAD_HASH}" -eq 64 ] || fail 'Theme payload validation returned an invalid payload hash.'
     if codex_is_running; then
       fail 'Codex is already running. Theme changes are next-launch only; fully exit Codex manually, then run start again.'
     fi
@@ -316,11 +392,22 @@ case "$ACTION" in
     fi
 
     stop_recorded_injector
-    "$NODE" "$INJECTOR" once --theme-dir "$THEME_DIR" --port "$PORT" || fail 'Theme injection failed; the native interface was kept.'
-    if ! "$NODE" "$INJECTOR" verify --theme-dir "$THEME_DIR" --port "$PORT"; then
-      "$NODE" "$INJECTOR" remove --theme-dir "$THEME_DIR" --port "$PORT" >/dev/null 2>&1 || true
+    if ! ONCE_RESULT="$("$NODE" "$INJECTOR" once --theme-dir "$THEME_DIR" --port "$PORT")"; then
+      "$NODE" "$INJECTOR" remove --port "$PORT" >/dev/null 2>&1 || true
+      fail 'Theme injection failed; any partial injection was removed.'
+    fi
+    [ "$(json_field "$ONCE_RESULT" payloadHash)" = "$PAYLOAD_HASH" ] || {
+      "$NODE" "$INJECTOR" remove --port "$PORT" >/dev/null 2>&1 || true
+      fail 'Theme injection payload hash did not match the validated payload; the native interface was restored.'
+    }
+    if ! VERIFY_RESULT="$("$NODE" "$INJECTOR" verify --theme-dir "$THEME_DIR" --port "$PORT")"; then
+      "$NODE" "$INJECTOR" remove --port "$PORT" >/dev/null 2>&1 || true
       fail 'Theme verification failed; the native interface was restored.'
     fi
+    [ "$(json_field "$VERIFY_RESULT" payloadHash)" = "$PAYLOAD_HASH" ] || {
+      "$NODE" "$INJECTOR" remove --port "$PORT" >/dev/null 2>&1 || true
+      fail 'Theme verification payload hash changed; the native interface was restored.'
+    }
 
     ensure_state_root
     : > "$INJECTOR_LOG"; : > "$INJECTOR_ERROR_LOG"
@@ -329,8 +416,8 @@ case "$ACTION" in
     /bin/kill -0 "$watcher_pid" 2>/dev/null || fail "Theme watcher exited during startup. See $INJECTOR_ERROR_LOG"
     watcher_start="$(process_started_at "$watcher_pid")"
     [ -n "$watcher_start" ] || fail 'Could not record the theme watcher identity.'
-    write_runtime "$watcher_pid" "$watcher_start"
-    if ! "$NODE" "$THEME_TOOL" mark-loaded --state "$STATE_PATH" --theme "$THEME_ID" --hash "$THEME_HASH"; then
+    write_runtime "$watcher_pid" "$watcher_start" "$PAYLOAD_HASH"
+    if ! "$NODE" "$THEME_TOOL" mark-loaded --state "$STATE_PATH" --theme "$THEME_ID" --hash "$PAYLOAD_HASH"; then
       stop_recorded_injector
       fail 'Could not record the loaded theme.'
     fi
@@ -338,11 +425,25 @@ case "$ACTION" in
 
   verify)
     verified_cdp "$PORT" || fail 'No verified Codex loopback endpoint is available.'
-    resolve_selected_theme true
+    resolve_loaded_theme
     "$NODE" "$INJECTOR" verify --theme-dir "$THEME_DIR" --port "$PORT"
     ;;
 
+  rollback)
+    acquire_start_lock
+    ensure_state_root
+    if [ -n "$THEME" ]; then
+      "$NODE" "$THEME_TOOL" rollback --catalog "$CATALOG" --state "$STATE_PATH" --theme "$THEME"
+    else
+      "$NODE" "$THEME_TOOL" rollback --catalog "$CATALOG" --state "$STATE_PATH"
+    fi
+    ;;
+
   restore)
+    acquire_start_lock
+    if codex_is_running && ! verified_cdp "$PORT"; then
+      fail 'Codex is running without a verified theme endpoint; refusing to clear theme state or stop the recorded watcher.'
+    fi
     stop_recorded_injector
     if verified_cdp "$PORT"; then "$NODE" "$INJECTOR" remove --port "$PORT" || fail 'Could not remove the injected theme safely.'; fi
     "$NODE" "$THEME_TOOL" mark-restored --state "$STATE_PATH"

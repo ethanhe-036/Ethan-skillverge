@@ -1,0 +1,29 @@
+html.codex-theme[data-codex-theme="soft-tactile"]
+[data-ct-part~="main"] :where(
+  [data-testid*="suggestion" i],
+  [data-testid*="home-card" i]
+) {
+  background: var(--ct-surface) !important;
+  border-color: color-mix(in srgb, var(--ct-border) 70%, transparent) !important;
+  box-shadow: var(--ct-shadow-low) !important;
+}
+
+html.codex-theme[data-codex-theme="soft-tactile"]
+[data-ct-part~="main"] :where(
+  [data-testid*="suggestion" i],
+  [data-testid*="home-card" i]
+):active {
+  box-shadow:
+    inset 2px 2px 5px color-mix(in srgb, var(--ct-border) 72%, transparent),
+    inset -2px -2px 5px var(--ct-surface-raised) !important;
+}
+
+@media (max-width: 720px), (prefers-contrast: more), (forced-colors: active) {
+  html.codex-theme[data-codex-theme="soft-tactile"]
+  [data-ct-part~="main"] :where(
+    [data-testid*="suggestion" i],
+    [data-testid*="home-card" i]
+  ) {
+    box-shadow: none !important;
+  }
+}

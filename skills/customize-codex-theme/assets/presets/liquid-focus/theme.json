@@ -2,28 +2,60 @@
   "id": "liquid-focus",
   "metadata": {
     "name": "Liquid Focus",
-    "summary": "克制的液态玻璃；透明只用于顶栏、菜单和输入区。",
-    "description": "克制的液态玻璃；透明只用于顶栏、菜单和输入区。",
+    "summary": "克制的液态玻璃；真实透明只用于小型顶栏，关键阅读面保持不透明。",
+    "description": "克制的液态玻璃；顶栏使用受控模糊，菜单和输入区以不透明高光、边缘与阴影保留玻璃质感。",
     "style": "liquid-glass",
     "license": "MIT",
     "provenance": "Original CSS-only preset; no third-party imagery."
   },
+  "aestheticProfile": {
+    "designThesis": "An optical engineering instrument where oceanic clarity surrounds calm, opaque work surfaces.",
+    "moodKeywords": ["precise", "oceanic", "focused"],
+    "signatureMotif": "a restrained optical horizon line",
+    "antiGoals": ["generic premium glass", "blur across reading surfaces", "decorative glow"],
+    "paletteStrategy": "restrained",
+    "motifBudget": {
+      "dominantMotifs": 1,
+      "secondaryMotifs": 2,
+      "accentAreaPercent": 6
+    }
+  },
+  "compositionProfile": {
+    "primaryFocus": ["composer", "active-task", "selected-navigation"],
+    "secondaryFocus": ["header"],
+    "quietZones": ["main", "code", "terminal", "settings"],
+    "viewportIntent": {
+      "wide": "preserve-hierarchy",
+      "split": "rebalance-focus",
+      "narrow": "reduce-decoration"
+    }
+  },
+  "materialGrammar": {
+    "canvas": "cool-mica",
+    "navigation": "cool-mica",
+    "controls": "optical-glass",
+    "reading": "opaque-instrument",
+    "transient": "optical-glass",
+    "elevationLevels": 3,
+    "lightingDirection": "top-left"
+  },
   "tokens": {
-    "canvas": "#eaf0f5",
-    "surface": "#f7fafc",
+    "canvas": "#e8f0f5",
+    "surface": "#f5f9fc",
     "surfaceRaised": "#ffffff",
-    "text": "#1c2933",
-    "muted": "#5c6b77",
-    "accent": "#26789a",
+    "text": "#172631",
+    "muted": "#52616d",
+    "accent": "#176987",
     "accentText": "#ffffff",
-    "border": "#afc3d0",
-    "focus": "#146c91",
-    "success": "#2d7b59",
-    "warning": "#8c6417",
-    "danger": "#b94047",
-    "info": "#276f99",
+    "border": "#a6becd",
+    "focus": "#0d6388",
+    "success": "#1f6546",
+    "warning": "#795308",
+    "danger": "#a72f38",
+    "info": "#31579b",
     "codeSurface": "#e1e9ef",
     "terminalSurface": "#12202a",
+    "terminalText": "#f4f7f8",
     "diffAddSurface": "#d9eee2",
     "diffRemoveSurface": "#f2dbde",
     "approvalSurface": "#f3e8c9",
@@ -48,7 +80,7 @@
     "success": "#63d49a",
     "warning": "#e8bd61",
     "danger": "#ff8188",
-    "info": "#77c4ed",
+    "info": "#9aaeff",
     "codeSurface": "#0d1419",
     "terminalSurface": "#080d11",
     "diffAddSurface": "#173b2c",
@@ -59,8 +91,14 @@
     "mode": "adaptive",
     "cssOnly": true,
     "userArt": false,
-    "glassChrome": true,
+    "glassChrome": false,
     "tactileControls": false,
     "experimental": true
+  },
+  "usability": {
+    "typography": "native",
+    "geometry": "native",
+    "criticalSurfaces": "opaque",
+    "motion": "state-only"
   }
 }

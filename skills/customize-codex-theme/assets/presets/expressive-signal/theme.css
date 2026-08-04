@@ -1,0 +1,15 @@
+html.codex-theme[data-codex-theme="expressive-signal"]
+:where([data-ct-part~="dialog"], [data-ct-part~="menu"]) {
+  border-color: var(--ct-border) !important;
+  box-shadow: inset 0 0 0 2px var(--ct-border) !important;
+}
+
+@media (forced-colors: active) {
+  html.codex-theme[data-codex-theme="expressive-signal"]
+  :where([data-ct-part~="dialog"], [data-ct-part~="menu"]) {
+    color: CanvasText !important;
+    background: Canvas !important;
+    border-color: CanvasText !important;
+    box-shadow: none !important;
+  }
+}

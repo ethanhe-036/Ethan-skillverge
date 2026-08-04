@@ -8,6 +8,37 @@
     "license": "MIT",
     "provenance": "Original CSS-only preset; no third-party imagery."
   },
+  "aestheticProfile": {
+    "designThesis": "A quiet instrument panel where restrained tactile feedback supports a flat, readable work surface.",
+    "moodKeywords": ["soft", "measured", "tactile"],
+    "signatureMotif": "subtle pressed control edges",
+    "antiGoals": ["borderless mush", "depth on every surface", "weak keyboard focus"],
+    "paletteStrategy": "restrained",
+    "motifBudget": {
+      "dominantMotifs": 1,
+      "secondaryMotifs": 1,
+      "accentAreaPercent": 5
+    }
+  },
+  "compositionProfile": {
+    "primaryFocus": ["composer", "active-task", "selected-navigation"],
+    "secondaryFocus": ["sidebar"],
+    "quietZones": ["main", "code", "terminal", "settings"],
+    "viewportIntent": {
+      "wide": "preserve-hierarchy",
+      "split": "rebalance-focus",
+      "narrow": "reduce-decoration"
+    }
+  },
+  "materialGrammar": {
+    "canvas": "soft-canvas",
+    "navigation": "soft-canvas",
+    "controls": "tactile-relief",
+    "reading": "flat-reading",
+    "transient": "tactile-relief",
+    "elevationLevels": 2,
+    "lightingDirection": "top-left"
+  },
   "tokens": {
     "canvas": "#e6ebf1",
     "surface": "#eef2f6",
@@ -18,12 +49,13 @@
     "accentText": "#ffffff",
     "border": "#aab4c0",
     "focus": "#17678f",
-    "success": "#34785a",
+    "success": "#2d6e51",
     "warning": "#876016",
     "danger": "#ae4148",
     "info": "#346f98",
     "codeSurface": "#dbe1e8",
     "terminalSurface": "#19232d",
+    "terminalText": "#f4f7f8",
     "diffAddSurface": "#d3e8db",
     "diffRemoveSurface": "#ecd5d8",
     "approvalSurface": "#eee2c2",
@@ -42,5 +74,11 @@
     "glassChrome": false,
     "tactileControls": true,
     "experimental": true
+  },
+  "usability": {
+    "typography": "native",
+    "geometry": "native",
+    "criticalSurfaces": "opaque",
+    "motion": "state-only"
   }
 }

@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "contractId": "codex-theme-runtime-surfaces",
+  "verifiedAgainst": {
+    "platform": "windows",
+    "codexVersion": "26.727.6591.0",
+    "verifiedAt": "2026-08-01"
+  },
+  "scopes": {
+    "settings": "[data-settings-panel-slug]",
+    "thread": "[data-message-author-role]",
+    "right-panel": "[data-app-shell-focus-area=\"right-panel\"]",
+    "home": "[data-app-shell-main-surface], main.main-surface"
+  },
+  "parts": {
+    "workbench": {
+      "cardinality": "one",
+      "required": true,
+      "tiers": {
+        "L1": ["body"]
+      }
+    },
+    "sidebar": {
+      "cardinality": "one",
+      "required": true,
+      "tiers": {
+        "L1": ["aside.app-shell-left-panel"],
+        "L2": ["[data-testid*=\"sidebar\" i]"]
+      }
+    },
+    "header": {
+      "cardinality": "many",
+      "required": false,
+      "maximum": 4,
+      "tiers": {
+        "L1": ["header.app-header-tint", "[class~=\"group/application-menu-top-bar\"]"],
+        "L2": ["[data-testid*=\"header\" i]"]
+      }
+    },
+    "main": {
+      "cardinality": "one",
+      "required": true,
+      "tiers": {
+        "L1": ["[data-app-shell-main-surface]", "main.main-surface", "div.main-surface"],
+        "L2": ["[role=\"main\"]"]
+      }
+    },
+    "right-panel": {
+      "cardinality": "one",
+      "required": false,
+      "tiers": {
+        "L1": ["[data-app-shell-focus-area=\"right-panel\"]"]
+      }
+    },
+    "composer": {
+      "cardinality": "one",
+      "required": false,
+      "tiers": {
+        "L1": [".composer-surface-chrome"],
+        "L2": ["[data-testid*=\"composer\" i]", "[data-testid*=\"prompt-input\" i]"]
+      }
+    },
+    "settings": {
+      "cardinality": "one",
+      "required": false,
+      "tiers": {
+        "L1": [
+          "aside.app-shell-left-panel:has([data-settings-panel-slug]) ~ [data-app-shell-main-surface]",
+          "[data-app-shell-main-surface]:has([data-settings-panel-slug])",
+          "aside.app-shell-left-panel:has([data-settings-panel-slug]) ~ main.main-surface",
+          "main.main-surface:has([data-settings-panel-slug])"
+        ],
+        "L2": ["[role=\"main\"]:has([data-settings-panel-slug])"]
+      }
+    },
+    "terminal": {
+      "cardinality": "many",
+      "required": false,
+      "maximum": 4,
+      "tiers": {
+        "L1": [".xterm"],
+        "L2": ["[data-testid*=\"terminal\" i]"]
+      }
+    },
+    "browser": {
+      "cardinality": "one",
+      "required": false,
+      "tiers": {
+        "L1": ["[data-browser-sidebar-webview][data-app-shell-focus-area=\"right-panel\"]"],
+        "L2": ["[data-app-shell-focus-area=\"right-panel\"] iframe", "[data-testid*=\"browser\" i]"]
+      }
+    },
+    "dialog": {
+      "cardinality": "many",
+      "required": false,
+      "maximum": 8,
+      "tiers": {
+        "L1": ["[role=\"dialog\"]"]
+      }
+    },
+    "menu": {
+      "cardinality": "many",
+      "required": false,
+      "maximum": 12,
+      "tiers": {
+        "L1": ["[role=\"menu\"]", "[role=\"listbox\"]"]
+      }
+    },
+    "overlay": {
+      "cardinality": "many",
+      "required": false,
+      "maximum": 12,
+      "tiers": {
+        "L1": ["[data-radix-popper-content-wrapper]"],
+        "L2": ["[data-testid*=\"popover\" i]"]
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": 1,
+  "states": [
+    {"id": "new-task", "requiredParts": ["workbench", "sidebar", "main", "composer"]},
+    {"id": "thread", "requiredParts": ["workbench", "sidebar", "header", "main", "composer"]},
+    {"id": "settings", "requiredParts": ["workbench", "sidebar", "main", "settings"]},
+    {"id": "right-launcher", "requiredParts": ["workbench", "sidebar", "main", "right-panel"]},
+    {"id": "side-tasks", "requiredParts": ["workbench", "sidebar", "main", "right-panel", "composer"]},
+    {"id": "browser", "requiredParts": ["workbench", "sidebar", "main", "right-panel", "browser"]},
+    {"id": "terminal", "requiredParts": ["workbench", "sidebar", "main", "terminal"]},
+    {"id": "dialog", "requiredParts": ["workbench", "main", "dialog"]}
+  ],
+  "viewports": [
+    {"id": "wide-100", "width": 1920, "height": 1080, "scale": 1},
+    {"id": "split-150", "width": 1280, "height": 800, "scale": 1.5},
+    {"id": "narrow-200", "width": 960, "height": 720, "scale": 2}
+  ],
+  "evidencePolicy": {
+    "coverage": "state-viewport-cross-product",
+    "privacy": "structure-only-no-text-no-input-values-no-urls",
+    "maximumNodes": 2500,
+    "viewportTolerance": {"width": 32, "height": 64, "scale": 0.05}
+  },
+  "releaseGates": {
+    "semanticMapRequired": true,
+    "continuousArtOwnerCount": 1,
+    "maximumOpaqueCoverage": 0.92,
+    "textContrastMinimum": 4.5,
+    "horizontalOverflowAllowed": false
+  }
+}
