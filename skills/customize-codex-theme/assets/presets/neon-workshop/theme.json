@@ -8,6 +8,37 @@
     "license": "MIT",
     "provenance": "Original CSS-only preset; no third-party imagery."
   },
+  "aestheticProfile": {
+    "designThesis": "A dark engineering bench where sparse luminous signals mark decisions without lighting the prose.",
+    "moodKeywords": ["technical", "nocturnal", "energized"],
+    "signatureMotif": "cyan-violet instrument signals",
+    "antiGoals": ["arcade dashboard", "glowing body text", "neon on every border"],
+    "paletteStrategy": "expressive",
+    "motifBudget": {
+      "dominantMotifs": 1,
+      "secondaryMotifs": 2,
+      "accentAreaPercent": 8
+    }
+  },
+  "compositionProfile": {
+    "primaryFocus": ["composer", "active-task", "selected-navigation"],
+    "secondaryFocus": ["header"],
+    "quietZones": ["main", "code", "terminal", "settings"],
+    "viewportIntent": {
+      "wide": "preserve-hierarchy",
+      "split": "rebalance-focus",
+      "narrow": "reduce-decoration"
+    }
+  },
+  "materialGrammar": {
+    "canvas": "graphite-bench",
+    "navigation": "graphite-panel",
+    "controls": "luminous-edge",
+    "reading": "opaque-graphite",
+    "transient": "graphite-panel",
+    "elevationLevels": 3,
+    "lightingDirection": "top"
+  },
   "tokens": {
     "canvas": "#11141a",
     "surface": "#181d26",
@@ -24,6 +55,7 @@
     "info": "#75bdf5",
     "codeSurface": "#0e1117",
     "terminalSurface": "#090c11",
+    "terminalText": "#f4f7f8",
     "diffAddSurface": "#173a2b",
     "diffRemoveSurface": "#412326",
     "approvalSurface": "#3a3320",
@@ -42,5 +74,11 @@
     "glassChrome": false,
     "tactileControls": false,
     "experimental": false
+  },
+  "usability": {
+    "typography": "native",
+    "geometry": "native",
+    "criticalSurfaces": "opaque",
+    "motion": "state-only"
   }
 }

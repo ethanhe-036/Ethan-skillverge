@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "semanticParts": [
+    "workbench",
+    "sidebar",
+    "header",
+    "main",
+    "right-panel",
+    "composer",
+    "settings",
+    "terminal",
+    "browser",
+    "dialog",
+    "menu",
+    "overlay"
+  ],
+  "continuousComposition": {
+    "singleArtOwner": "workbench",
+    "transparentOrTintedParts": ["sidebar", "header", "main", "right-panel", "settings"],
+    "opaqueSafetyParts": ["composer", "terminal", "browser", "dialog", "menu", "overlay"],
+    "maximumOpaqueCoverage": 0.92,
+    "maximumSurfaceAlpha": 0.96
+  },
+  "coordinateOwnership": {
+    "contractVersion": 1,
+    "coordinateSpace": "semantic-workbench-viewport",
+    "singleRasterOwner": "workbench",
+    "independentPanelRasterOwners": "forbidden",
+    "independentPanelCrops": "forbidden",
+    "artTopology": "author-defined-metadata",
+    "geometryAuthority": "native",
+    "interactionAuthority": "native-only"
+  },
+  "headerMaterial": {
+    "contractVersion": 1,
+    "owner": "shared-runtime",
+    "outerDragSurface": "transparent",
+    "semanticSurface": "continuous-material-veil",
+    "layers": ["control-protection", "vertical-veil"],
+    "themePackPaintOwnership": "forbidden",
+    "themePackTuning": "bounded-root-custom-properties-only",
+    "tuningProperties": [
+      "--ct-header-material-surface",
+      "--ct-header-material-top-tint",
+      "--ct-header-material-mid-tint",
+      "--ct-header-material-bottom-tint",
+      "--ct-header-material-control-tint"
+    ],
+    "accessibilityFallback": "opaque-native-safe"
+  },
+  "settingsMaterial": {
+    "contractVersion": 1,
+    "owner": "shared-runtime",
+    "semanticSurface": "continuous-canvas-material",
+    "defaultTintPercent": 52,
+    "splitFallbackTintPercent": 60,
+    "narrowFallbackTintPercent": 68,
+    "maximumNormalTintPercent": 68,
+    "themePackMaterialOwnership": "forbidden-for-artwork-themes",
+    "protectedOpaqueDescendants": [
+      "cards",
+      "fields",
+      "controls",
+      "menus",
+      "dialogs"
+    ],
+    "accessibilityFallback": "opaque-native-safe"
+  },
+  "themePackPolicy": {
+    "preferredSelectorPrefix": "html.codex-theme[data-codex-theme] [data-ct-part~=",
+    "rawNativeSelectors": "legacy-only",
+    "forbiddenPatterns": [":nth-child(", ":nth-of-type(", "[style*=", "body > div > div >"]
+  }
+}

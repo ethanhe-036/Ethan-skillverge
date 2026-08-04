@@ -8,6 +8,37 @@
     "license": "MIT",
     "provenance": "Original CSS-only preset; no third-party imagery."
   },
+  "aestheticProfile": {
+    "designThesis": "A quiet editorial desk where precise ink hierarchy makes long engineering work feel calm.",
+    "moodKeywords": ["editorial", "warm", "precise"],
+    "signatureMotif": "restrained ink hairlines",
+    "antiGoals": ["sterile white software", "decorative paper clutter", "heavy shadows"],
+    "paletteStrategy": "restrained",
+    "motifBudget": {
+      "dominantMotifs": 1,
+      "secondaryMotifs": 1,
+      "accentAreaPercent": 5
+    }
+  },
+  "compositionProfile": {
+    "primaryFocus": ["composer", "active-task", "selected-navigation"],
+    "secondaryFocus": ["header"],
+    "quietZones": ["main", "code", "terminal", "settings"],
+    "viewportIntent": {
+      "wide": "preserve-hierarchy",
+      "split": "rebalance-focus",
+      "narrow": "reduce-decoration"
+    }
+  },
+  "materialGrammar": {
+    "canvas": "matte-ivory",
+    "navigation": "matte-ivory",
+    "controls": "lifted-paper",
+    "reading": "clean-paper",
+    "transient": "lifted-paper",
+    "elevationLevels": 2,
+    "lightingDirection": "top-left"
+  },
   "tokens": {
     "canvas": "#f7f4ed",
     "surface": "#fffdf8",
@@ -24,6 +55,7 @@
     "info": "#285f8f",
     "codeSurface": "#eee9df",
     "terminalSurface": "#1e2022",
+    "terminalText": "#f4f7f8",
     "diffAddSurface": "#dcecdf",
     "diffRemoveSurface": "#f3dddd",
     "approvalSurface": "#f5ead2",
@@ -42,5 +74,11 @@
     "glassChrome": false,
     "tactileControls": false,
     "experimental": false
+  },
+  "usability": {
+    "typography": "native",
+    "geometry": "native",
+    "criticalSurfaces": "opaque",
+    "motion": "state-only"
   }
 }

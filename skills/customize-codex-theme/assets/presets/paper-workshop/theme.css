@@ -1,0 +1,21 @@
+/*
+ * Paper Workshop owns only CSS texture. It does not claim a second raster
+ * owner or encode native Codex topology.
+ */
+html.codex-theme[data-codex-theme="paper-workshop"]
+body[data-ct-part~="workbench"] {
+  background-image:
+    linear-gradient(rgba(255, 248, 234, .84), rgba(239, 227, 207, .90)),
+    repeating-linear-gradient(
+      7deg,
+      rgba(104, 81, 46, .035) 0 1px,
+      transparent 1px 5px
+    ) !important;
+}
+
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  html.codex-theme[data-codex-theme="paper-workshop"]
+  body[data-ct-part~="workbench"] {
+    background-image: none !important;
+  }
+}

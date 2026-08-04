@@ -2,8 +2,370 @@
 html.codex-theme {
   color-scheme: var(--ct-color-scheme);
   accent-color: var(--ct-accent);
-  font-family: var(--ct-body-font);
   background: var(--ct-canvas);
+
+  /*
+   * Shared header material is runtime-owned. Packs may tune only these
+   * bounded custom properties on their theme root; they must not repaint the
+   * semantic header itself. The defaults reproduce the approved continuous
+   * canvas treatment for CSS-only themes as well as artwork themes.
+   */
+  --ct-header-material-surface: var(--ct-surface);
+  --ct-header-material-top-tint: 22%;
+  --ct-header-material-mid-tint: 38%;
+  --ct-header-material-bottom-tint: 52%;
+  --ct-header-material-control-tint: 14%;
+
+  /*
+   * Settings owns a lighter runtime material than utility right panels. Its
+   * unused canvas should retain the shared artwork while native cards, fields,
+   * controls, menus, and dialogs remain opaque above it.
+   */
+  --ct-settings-tint: 52%;
+
+  /*
+   * Codex can keep its native `electron-light`/`electron-dark` class while a
+   * theme pack deliberately uses the opposite mode. Bridge native semantic
+   * paint tokens to the pack palette so utility classes do not put light-mode
+   * ink on dark themed surfaces (or the inverse). This changes paint only; it
+   * does not mutate Codex's native appearance setting.
+   */
+  --color-background-surface: var(--ct-surface);
+  --color-background-surface-under: var(--ct-canvas);
+  --color-background-elevated-primary: var(--ct-surface-raised);
+  --color-background-elevated-primary-opaque: var(--ct-surface-raised);
+  --color-background-elevated-secondary: var(--ct-surface-raised);
+  --color-background-elevated-secondary-opaque: var(--ct-surface-raised);
+  --color-background-application-menu: var(--ct-surface-raised);
+  --color-background-button-primary: var(--ct-accent);
+  --color-background-button-primary-hover: color-mix(in srgb, var(--ct-accent) 82%, var(--ct-surface-raised));
+  --color-background-button-primary-active: color-mix(in srgb, var(--ct-accent) 72%, var(--ct-surface-raised));
+  --color-background-button-primary-inactive: color-mix(in srgb, var(--ct-accent) 42%, var(--ct-surface));
+  --color-background-button-secondary: color-mix(in srgb, var(--ct-border) 30%, transparent);
+  --color-background-button-secondary-hover: color-mix(in srgb, var(--ct-accent) 14%, var(--ct-surface-raised));
+  --color-background-button-secondary-active: color-mix(in srgb, var(--ct-accent) 22%, var(--ct-surface-raised));
+  --color-background-button-secondary-inactive: color-mix(in srgb, var(--ct-border) 16%, transparent);
+  --color-background-button-tertiary: transparent;
+  --color-background-button-tertiary-hover: color-mix(in srgb, var(--ct-accent) 14%, transparent);
+  --color-background-button-tertiary-active: color-mix(in srgb, var(--ct-accent) 22%, transparent);
+  --color-background-status-success: color-mix(in srgb, var(--ct-success) 14%, var(--ct-surface));
+  --color-background-status-warning: color-mix(in srgb, var(--ct-warning) 14%, var(--ct-surface));
+  --color-background-status-error: color-mix(in srgb, var(--ct-danger) 14%, var(--ct-surface));
+
+  --color-border-focus: var(--ct-focus);
+  --color-border-heavy: var(--ct-border);
+  --color-border-light: color-mix(in srgb, var(--ct-border) 60%, transparent);
+  --color-border-application-menu-separator: var(--ct-border);
+  --color-border-error: var(--ct-danger);
+  --color-border-warning: var(--ct-warning);
+
+  --color-icon-primary: var(--ct-text);
+  --color-icon-secondary: var(--ct-muted);
+  --color-icon-tertiary: var(--ct-muted);
+  --color-icon-accent: var(--ct-focus);
+  --color-icon-success: var(--ct-success);
+  --color-icon-warning: var(--ct-warning);
+  --color-icon-error: var(--ct-danger);
+
+  --color-text-foreground: var(--ct-text);
+  --color-text-foreground-secondary: var(--ct-muted);
+  --color-text-foreground-tertiary: var(--ct-muted);
+  --color-text-accent: var(--ct-focus);
+  --color-text-on-accent: var(--ct-accent-text);
+  --color-text-button-primary: var(--ct-accent-text);
+  --color-text-button-secondary: var(--ct-text);
+  --color-text-button-tertiary: var(--ct-muted);
+  --color-text-success: var(--ct-success);
+  --color-text-warning: var(--ct-warning);
+  --color-text-error: var(--ct-danger);
+
+  --color-token-foreground: var(--ct-text);
+  --color-token-text-primary: var(--ct-text);
+  --color-token-text-secondary: var(--ct-muted);
+  --color-token-text-tertiary: var(--ct-muted);
+  --color-token-conversation-body: var(--ct-muted);
+  --color-token-conversation-header: var(--ct-muted);
+  --color-token-conversation-summary-leading: var(--ct-muted);
+  --color-token-conversation-summary-trailing: var(--ct-muted);
+  --color-token-description-foreground: var(--ct-muted);
+  --color-token-disabled-foreground: var(--ct-muted);
+  --color-token-badge-foreground: var(--ct-muted);
+  --color-token-activity-bar-badge-foreground: var(--ct-accent-text);
+  --color-token-dropdown-foreground: var(--ct-text);
+  --color-token-editor-foreground: var(--ct-text);
+  --color-token-editor-error-foreground: var(--ct-danger);
+  --color-token-editor-warning-foreground: var(--ct-warning);
+  --color-token-error-foreground: var(--ct-danger);
+  --color-token-icon-foreground: var(--ct-text);
+  --color-token-input-foreground: var(--ct-text);
+  --color-token-input-placeholder-foreground: var(--ct-muted);
+  --color-token-list-active-selection-foreground: var(--ct-text);
+  --color-token-list-active-selection-icon-foreground: var(--ct-text);
+  --color-token-menubar-selection-foreground: var(--ct-text);
+  --color-token-text-preformat-foreground: var(--ct-text);
+  --color-token-terminal-foreground: var(--ct-terminal-text);
+  --color-token-application-menu-foreground: var(--ct-text);
+  --color-token-checkbox-foreground: var(--ct-accent-text);
+  --color-token-radio-active-foreground: var(--ct-text);
+  --color-token-text-link-foreground: var(--ct-info);
+  --color-token-text-link-active-foreground: var(--ct-info);
+  --color-token-git-decoration-added-resource-foreground: var(--ct-success);
+  --color-token-git-decoration-modified-resource-foreground: var(--ct-info);
+  --color-token-git-decoration-deleted-resource-foreground: var(--ct-danger);
+  --color-token-git-decoration-renamed-resource-foreground: var(--ct-info);
+  --color-token-git-decoration-untracked-resource-foreground: var(--ct-success);
+  --color-token-git-decoration-ignored-resource-foreground: var(--ct-muted);
+
+  --color-token-main-surface-primary: var(--ct-surface);
+  --color-token-application-menu-background: var(--ct-surface-raised);
+  --color-token-menu-background: var(--ct-surface-raised);
+  --color-token-input-background: var(--ct-surface-raised);
+  --color-token-diff-surface: var(--ct-code-surface);
+  --color-token-text-code-block-background: var(--ct-code-surface);
+  --color-token-text-preformat-background: var(--ct-code-surface);
+  --color-token-button-background: var(--ct-accent);
+  --color-token-button-foreground: var(--ct-accent-text);
+  --color-token-button-secondary-hover-background: color-mix(in srgb, var(--ct-accent) 14%, var(--ct-surface-raised));
+  --color-token-toolbar-hover-background: color-mix(in srgb, var(--ct-accent) 14%, var(--ct-surface-raised));
+  --color-token-input-validation-error-background: var(--ct-diff-remove-surface);
+  --color-token-input-validation-error-border: var(--ct-danger);
+  --color-token-input-validation-warning-background: var(--ct-approval-surface);
+  --color-token-input-validation-warning-border: var(--ct-warning);
+
+  --color-token-border: var(--ct-border);
+  --color-token-border-default: var(--ct-border);
+  --color-token-border-heavy: var(--ct-border);
+  --color-token-border-light: color-mix(in srgb, var(--ct-border) 60%, transparent);
+  --color-token-button-border: var(--ct-border);
+  --color-token-checkbox-border: var(--ct-border);
+  --color-token-focus-border: var(--ct-focus);
+  --color-token-input-border: var(--ct-border);
+  --color-token-menu-border: var(--ct-border);
+  --color-token-radio-inactive-border: var(--ct-border);
+  --color-token-terminal-border: var(--ct-border);
+
+  --vscode-foreground: var(--ct-text);
+  --vscode-descriptionForeground: var(--ct-muted);
+  --vscode-disabledForeground: var(--ct-muted);
+  --vscode-icon-foreground: var(--ct-text);
+  --vscode-focusBorder: var(--ct-focus);
+  --vscode-editor-foreground: var(--ct-text);
+  --vscode-editor-background: var(--ct-code-surface);
+  --vscode-input-foreground: var(--ct-text);
+  --vscode-input-background: var(--ct-surface-raised);
+  --vscode-input-border: var(--ct-border);
+  --vscode-input-placeholderForeground: var(--ct-muted);
+  --vscode-dropdown-foreground: var(--ct-text);
+  --vscode-dropdown-background: var(--ct-surface-raised);
+  --vscode-dropdown-border: var(--ct-border);
+  --vscode-menu-foreground: var(--ct-text);
+  --vscode-menu-background: var(--ct-surface-raised);
+  --vscode-menu-border: var(--ct-border);
+  --vscode-terminal-foreground: var(--ct-terminal-text);
+  --vscode-terminal-background: var(--ct-terminal-surface);
+  --vscode-textLink-foreground: var(--ct-info);
+  --vscode-textLink-activeForeground: var(--ct-info);
+  --vscode-errorForeground: var(--ct-danger);
+  --vscode-editorWarning-foreground: var(--ct-warning);
+  --vscode-gitDecoration-addedResourceForeground: var(--ct-success);
+  --vscode-gitDecoration-modifiedResourceForeground: var(--ct-info);
+  --vscode-gitDecoration-deletedResourceForeground: var(--ct-danger);
+  --vscode-gitDecoration-renamedResourceForeground: var(--ct-info);
+  --vscode-gitDecoration-untrackedResourceForeground: var(--ct-success);
+  --vscode-gitDecoration-ignoredResourceForeground: var(--ct-muted);
+}
+
+/*
+ * The Electron shell writes its current native palette as inline custom
+ * properties. These important semantic assignments are intentionally limited
+ * to paint tokens so an opposite-mode pack remains coherent without changing
+ * the user's native appearance setting or any workbench geometry.
+ */
+html.codex-theme,
+html.codex-theme :where(.app-theme.electron-light, .app-theme.electron-dark) {
+  --codex-base-accent: var(--ct-accent) !important;
+  --codex-base-ink: var(--ct-text) !important;
+  --codex-base-surface: var(--ct-surface) !important;
+
+  --color-background-accent: color-mix(in srgb, var(--ct-focus) 18%, var(--ct-surface-raised)) !important;
+  --color-background-accent-hover: color-mix(in srgb, var(--ct-focus) 24%, var(--ct-surface-raised)) !important;
+  --color-background-accent-active: color-mix(in srgb, var(--ct-focus) 32%, var(--ct-surface-raised)) !important;
+  --color-background-application-menu: var(--ct-surface-raised) !important;
+  --color-background-button-primary: var(--ct-accent) !important;
+  --color-background-button-primary-hover: color-mix(in srgb, var(--ct-accent) 82%, var(--ct-surface-raised)) !important;
+  --color-background-button-primary-active: color-mix(in srgb, var(--ct-accent) 72%, var(--ct-surface-raised)) !important;
+  --color-background-button-primary-inactive: color-mix(in srgb, var(--ct-accent) 42%, var(--ct-surface)) !important;
+  --color-background-button-secondary: color-mix(in srgb, var(--ct-border) 30%, transparent) !important;
+  --color-background-button-secondary-hover: color-mix(in srgb, var(--ct-accent) 14%, var(--ct-surface-raised)) !important;
+  --color-background-button-secondary-active: color-mix(in srgb, var(--ct-accent) 22%, var(--ct-surface-raised)) !important;
+  --color-background-button-secondary-inactive: color-mix(in srgb, var(--ct-border) 16%, transparent) !important;
+  --color-background-button-tertiary: transparent !important;
+  --color-background-button-tertiary-hover: color-mix(in srgb, var(--ct-accent) 14%, transparent) !important;
+  --color-background-button-tertiary-active: color-mix(in srgb, var(--ct-accent) 22%, transparent) !important;
+  --color-background-control: var(--ct-surface-raised) !important;
+  --color-background-control-opaque: var(--ct-surface-raised) !important;
+  --color-background-danger-active: var(--ct-danger) !important;
+  --color-background-editor-opaque: var(--ct-code-surface) !important;
+  --color-background-elevated-primary: var(--ct-surface-raised) !important;
+  --color-background-elevated-primary-opaque: var(--ct-surface-raised) !important;
+  --color-background-elevated-secondary: var(--ct-surface-raised) !important;
+  --color-background-elevated-secondary-opaque: var(--ct-surface-raised) !important;
+  --color-background-panel: var(--ct-surface) !important;
+  --color-background-status-success: color-mix(in srgb, var(--ct-success) 14%, var(--ct-surface)) !important;
+  --color-background-status-warning: color-mix(in srgb, var(--ct-warning) 14%, var(--ct-surface)) !important;
+  --color-background-status-error: color-mix(in srgb, var(--ct-danger) 14%, var(--ct-surface)) !important;
+  --color-background-surface: var(--ct-surface) !important;
+  --color-background-surface-under: var(--ct-canvas) !important;
+
+  --color-border: var(--ct-border) !important;
+  --color-border-application-menu-separator: var(--ct-border) !important;
+  --color-border-error: var(--ct-danger) !important;
+  --color-border-focus: var(--ct-focus) !important;
+  --color-border-heavy: var(--ct-border) !important;
+  --color-border-light: color-mix(in srgb, var(--ct-border) 60%, transparent) !important;
+  --color-border-warning: var(--ct-warning) !important;
+
+  --color-icon-accent: var(--ct-focus) !important;
+  --color-icon-error: var(--ct-danger) !important;
+  --color-icon-primary: var(--ct-text) !important;
+  --color-icon-secondary: var(--ct-muted) !important;
+  --color-icon-success: var(--ct-success) !important;
+  --color-icon-tertiary: var(--ct-muted) !important;
+  --color-icon-warning: var(--ct-warning) !important;
+
+  --color-foreground-application-menu: var(--ct-text) !important;
+  --color-text-accent: var(--ct-focus) !important;
+  --color-text-button-primary: var(--ct-accent-text) !important;
+  --color-text-button-secondary: var(--ct-text) !important;
+  --color-text-button-tertiary: var(--ct-muted) !important;
+  --color-text-error: var(--ct-danger) !important;
+  --color-text-foreground: var(--ct-text) !important;
+  --color-text-foreground-secondary: var(--ct-muted) !important;
+  --color-text-foreground-tertiary: var(--ct-muted) !important;
+  --color-text-on-accent: var(--ct-accent-text) !important;
+  --color-text-success: var(--ct-success) !important;
+  --color-text-warning: var(--ct-warning) !important;
+
+  --color-token-foreground: var(--ct-text) !important;
+  --color-token-text-primary: var(--ct-text) !important;
+  --color-token-text-secondary: var(--ct-muted) !important;
+  --color-token-text-tertiary: var(--ct-muted) !important;
+  --color-token-conversation-body: var(--ct-muted) !important;
+  --color-token-conversation-header: var(--ct-muted) !important;
+  --color-token-conversation-summary-leading: var(--ct-muted) !important;
+  --color-token-conversation-summary-trailing: var(--ct-muted) !important;
+  --color-token-description-foreground: var(--ct-muted) !important;
+  --color-token-disabled-foreground: var(--ct-muted) !important;
+  --color-token-badge-foreground: var(--ct-muted) !important;
+  --color-token-activity-bar-badge-foreground: var(--ct-accent-text) !important;
+  --color-token-dropdown-foreground: var(--ct-text) !important;
+  --color-token-editor-foreground: var(--ct-text) !important;
+  --color-token-editor-error-foreground: var(--ct-danger) !important;
+  --color-token-editor-warning-foreground: var(--ct-warning) !important;
+  --color-token-error-foreground: var(--ct-danger) !important;
+  --color-token-icon-foreground: var(--ct-text) !important;
+  --color-token-input-foreground: var(--ct-text) !important;
+  --color-token-input-placeholder-foreground: var(--ct-text) !important;
+  --color-token-list-active-selection-foreground: var(--ct-text) !important;
+  --color-token-list-active-selection-icon-foreground: var(--ct-text) !important;
+  --color-token-menubar-selection-foreground: var(--ct-text) !important;
+  --color-token-text-preformat-foreground: var(--ct-text) !important;
+  --color-token-terminal-foreground: var(--ct-terminal-text) !important;
+  --color-token-application-menu-foreground: var(--ct-text) !important;
+  --color-token-checkbox-foreground: var(--ct-accent-text) !important;
+  --color-token-radio-active-foreground: var(--ct-text) !important;
+  --color-token-text-link-foreground: var(--ct-info) !important;
+  --color-token-text-link-active-foreground: var(--ct-info) !important;
+  --color-token-git-decoration-added-resource-foreground: var(--ct-success) !important;
+  --color-token-git-decoration-modified-resource-foreground: var(--ct-info) !important;
+  --color-token-git-decoration-deleted-resource-foreground: var(--ct-danger) !important;
+  --color-token-git-decoration-renamed-resource-foreground: var(--ct-info) !important;
+  --color-token-git-decoration-untracked-resource-foreground: var(--ct-success) !important;
+  --color-token-git-decoration-ignored-resource-foreground: var(--ct-muted) !important;
+
+  --color-token-main-surface-primary: var(--ct-surface) !important;
+  --color-token-application-menu-background: var(--ct-surface-raised) !important;
+  --color-token-menu-background: var(--ct-surface-raised) !important;
+  --color-token-input-background: var(--ct-surface-raised) !important;
+  --color-token-diff-surface: var(--ct-code-surface) !important;
+  --color-token-text-code-block-background: var(--ct-code-surface) !important;
+  --color-token-text-preformat-background: var(--ct-code-surface) !important;
+  --color-token-button-background: var(--ct-accent) !important;
+  --color-token-button-foreground: var(--ct-accent-text) !important;
+  --color-token-button-secondary-hover-background: color-mix(in srgb, var(--ct-accent) 14%, var(--ct-surface-raised)) !important;
+  --color-token-toolbar-hover-background: color-mix(in srgb, var(--ct-accent) 14%, var(--ct-surface-raised)) !important;
+  --color-token-input-validation-error-background: var(--ct-diff-remove-surface) !important;
+  --color-token-input-validation-error-border: var(--ct-danger) !important;
+  --color-token-input-validation-warning-background: var(--ct-approval-surface) !important;
+  --color-token-input-validation-warning-border: var(--ct-warning) !important;
+
+  --color-token-border: var(--ct-border) !important;
+  --color-token-border-default: var(--ct-border) !important;
+  --color-token-border-heavy: var(--ct-border) !important;
+  --color-token-border-light: color-mix(in srgb, var(--ct-border) 60%, transparent) !important;
+  --color-token-button-border: var(--ct-border) !important;
+  --color-token-checkbox-border: var(--ct-border) !important;
+  --color-token-focus-border: var(--ct-focus) !important;
+  --color-token-input-border: var(--ct-border) !important;
+  --color-token-menu-border: var(--ct-border) !important;
+  --color-token-radio-inactive-border: var(--ct-border) !important;
+  --color-token-terminal-border: var(--ct-border) !important;
+
+  --vscode-foreground: var(--ct-text) !important;
+  --vscode-descriptionForeground: var(--ct-muted) !important;
+  --vscode-disabledForeground: var(--ct-muted) !important;
+  --vscode-icon-foreground: var(--ct-text) !important;
+  --vscode-focusBorder: var(--ct-focus) !important;
+  --vscode-editor-foreground: var(--ct-text) !important;
+  --vscode-editor-background: var(--ct-code-surface) !important;
+  --vscode-panel-background: var(--ct-surface) !important;
+  --vscode-sideBar-background: var(--ct-surface) !important;
+  --vscode-activityBar-background: var(--ct-surface-raised) !important;
+  --vscode-titleBar-activeBackground: var(--ct-surface-raised) !important;
+  --vscode-titleBar-inactiveBackground: var(--ct-surface-raised) !important;
+  --vscode-tab-activeBackground: var(--ct-surface-raised) !important;
+  --vscode-tab-inactiveBackground: var(--ct-surface) !important;
+  --vscode-editorGroupHeader-tabsBackground: var(--ct-surface) !important;
+  --vscode-editorGroupHeader-noTabsBackground: var(--ct-surface) !important;
+  --vscode-editorWidget-foreground: var(--ct-text) !important;
+  --vscode-editorWidget-background: var(--ct-surface-raised) !important;
+  --vscode-editorHoverWidget-foreground: var(--ct-text) !important;
+  --vscode-editorHoverWidget-background: var(--ct-surface-raised) !important;
+  --vscode-quickInput-foreground: var(--ct-text) !important;
+  --vscode-quickInput-background: var(--ct-surface-raised) !important;
+  --vscode-input-foreground: var(--ct-text) !important;
+  --vscode-input-background: var(--ct-surface-raised) !important;
+  --vscode-input-border: var(--ct-border) !important;
+  --vscode-input-placeholderForeground: var(--ct-muted) !important;
+  --vscode-dropdown-foreground: var(--ct-text) !important;
+  --vscode-dropdown-background: var(--ct-surface-raised) !important;
+  --vscode-dropdown-listBackground: var(--ct-surface-raised) !important;
+  --vscode-dropdown-border: var(--ct-border) !important;
+  --vscode-menu-foreground: var(--ct-text) !important;
+  --vscode-menu-background: var(--ct-surface-raised) !important;
+  --vscode-menu-border: var(--ct-border) !important;
+  --vscode-terminal-foreground: var(--ct-terminal-text) !important;
+  --vscode-terminal-background: var(--ct-terminal-surface) !important;
+  --vscode-textLink-foreground: var(--ct-info) !important;
+  --vscode-textLink-activeForeground: var(--ct-info) !important;
+  --vscode-errorForeground: var(--ct-danger) !important;
+  --vscode-editorWarning-foreground: var(--ct-warning) !important;
+  --vscode-gitDecoration-addedResourceForeground: var(--ct-success) !important;
+  --vscode-gitDecoration-modifiedResourceForeground: var(--ct-info) !important;
+  --vscode-gitDecoration-deletedResourceForeground: var(--ct-danger) !important;
+  --vscode-gitDecoration-renamedResourceForeground: var(--ct-info) !important;
+  --vscode-gitDecoration-untrackedResourceForeground: var(--ct-success) !important;
+  --vscode-gitDecoration-ignoredResourceForeground: var(--ct-muted) !important;
+  --vscode-notifications-foreground: var(--ct-text) !important;
+  --vscode-notifications-background: var(--ct-surface-raised) !important;
+  --vscode-settings-headerForeground: var(--ct-text) !important;
+  --vscode-settings-textInputBackground: var(--ct-surface-raised) !important;
+  --vscode-settings-textInputForeground: var(--ct-text) !important;
+  --vscode-settings-dropdownBackground: var(--ct-surface-raised) !important;
+  --vscode-settings-dropdownForeground: var(--ct-text) !important;
+  --vscode-checkbox-background: var(--ct-surface-raised) !important;
+  --vscode-checkbox-foreground: var(--ct-accent-text) !important;
+  --vscode-checkbox-border: var(--ct-border) !important;
 }
 
 html.codex-theme body {
@@ -12,11 +374,45 @@ html.codex-theme body {
   background-image: var(--ct-user-art, none);
   background-position: center;
   background-size: cover;
-  background-attachment: fixed;
+}
+
+/*
+ * The Browser sidebar is a separate Electron guest renderer. Preserve the
+ * native host paint and color-scheme so a delayed/transparent guest cannot be
+ * replaced by the workbench palette. Never override its app-owned visibility,
+ * opacity, pointer events, or geometry.
+ */
+html.codex-theme [data-browser-sidebar-webview],
+html.codex-theme [data-browser-sidebar-webview] > webview {
+  color-scheme: var(--ct-native-browser-color-scheme, normal) !important;
+}
+
+html.codex-theme [data-browser-sidebar-webview] > webview {
+  color: var(--ct-native-browser-color, CanvasText) !important;
+  background-color: var(--ct-native-browser-background, Canvas) !important;
+}
+
+/*
+ * Continuous composition contract:
+ * the workbench owns the only raster and every large shell surface shares its
+ * viewport coordinate system through transparent semantic tints.
+ */
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"] body[data-ct-part~="workbench"] {
+  background-color: var(--ct-canvas) !important;
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--ct-canvas) var(--ct-workbench-scrim, 35%), transparent),
+      color-mix(in srgb, var(--ct-canvas) var(--ct-workbench-scrim, 35%), transparent)
+    ),
+    var(--ct-workbench-art, var(--ct-user-art, none)) !important;
+  background-position: center, var(--ct-art-focus-x, 50%) var(--ct-art-focus-y, 50%) !important;
+  background-size: cover, cover !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-attachment: fixed, fixed !important;
 }
 
 html.codex-theme.codex-theme-has-art :where(main, aside, nav, [role="main"], [role="complementary"], [data-testid*="sidebar" i]) {
-  background-color: color-mix(in srgb, var(--ct-surface) 90%, transparent) !important;
+  background-color: var(--ct-surface) !important;
 }
 
 html.codex-theme ::selection {
@@ -26,7 +422,6 @@ html.codex-theme ::selection {
 
 html.codex-theme :where(h1, h2, h3, h4, h5, h6) {
   color: var(--ct-text) !important;
-  font-family: var(--ct-display-font);
 }
 
 html.codex-theme :where(main, aside, nav, [role="main"], [role="complementary"], [data-testid*="sidebar" i]) {
@@ -35,10 +430,123 @@ html.codex-theme :where(main, aside, nav, [role="main"], [role="complementary"],
   border-color: var(--ct-border) !important;
 }
 
-html.codex-theme :where(header, footer, [data-testid*="header" i], [data-testid*="toolbar" i]) {
+html.codex-theme :where(
+  header:not([data-app-shell-application-menu-bar="true"]),
+  footer,
+  [data-testid*="header" i],
+  [data-testid*="toolbar" i]
+) {
   color: var(--ct-text);
   background-color: var(--ct-surface-raised) !important;
   border-color: var(--ct-border) !important;
+}
+
+/*
+ * The application menu bar is a transparent drag surface spanning the main
+ * and right-panel header slots. Its semantic child paints the main slot while
+ * app-shell tabs paint the right slot. An opaque outer fill covers those tabs
+ * even though their DOM and hit targets remain visible.
+ */
+html.codex-theme header[data-app-shell-application-menu-bar="true"] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/*
+ * The semantic header is a light material veil over the same canvas as the
+ * workbench. The horizontal layer protects controls near the edges; the
+ * vertical layer gives the bar enough density without turning it into an
+ * opaque slab. Geometry and interaction remain native.
+ */
+html.codex-theme [data-ct-part~="header"] {
+  background-color: transparent !important;
+  background-image:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ct-header-material-surface, var(--ct-surface)) var(--ct-header-material-control-tint, 14%), transparent) 0%,
+      transparent 24%,
+      transparent 76%,
+      color-mix(in srgb, var(--ct-header-material-surface, var(--ct-surface)) var(--ct-header-material-control-tint, 14%), transparent) 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ct-header-material-surface, var(--ct-surface)) var(--ct-header-material-top-tint, 22%), transparent) 0%,
+      color-mix(in srgb, var(--ct-header-material-surface, var(--ct-surface)) var(--ct-header-material-mid-tint, 38%), transparent) 56%,
+      color-mix(in srgb, var(--ct-header-material-surface, var(--ct-surface)) var(--ct-header-material-bottom-tint, 52%), transparent) 100%
+    ) !important;
+  background-repeat: no-repeat !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"] [data-ct-part~="sidebar"] {
+  background-color: color-mix(in srgb, var(--ct-surface) var(--ct-sidebar-tint, 72%), transparent) !important;
+  background-image: none !important;
+}
+
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"] [data-ct-part~="main"] {
+  background-color: color-mix(in srgb, var(--ct-surface) var(--ct-main-tint, 78%), transparent) !important;
+  background-image: none !important;
+}
+
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"] [data-ct-part~="right-panel"] {
+  background-color: color-mix(in srgb, var(--ct-surface) var(--ct-right-panel-tint, 72%), transparent) !important;
+  background-image: none !important;
+}
+
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"] [data-ct-part~="settings"] {
+  background-color: color-mix(in srgb, var(--ct-surface) var(--ct-settings-tint, 52%), transparent) !important;
+  background-image: none !important;
+}
+
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"]
+[data-ct-part~="main"][data-ct-part~="settings"] {
+  background-color: color-mix(in srgb, var(--ct-surface) var(--ct-settings-tint, 52%), transparent) !important;
+  background-image: none !important;
+}
+
+/*
+ * The runtime platform, not individual theme packs, owns Codex shell topology.
+ * Clear only structural workbench layers so the single compositor remains
+ * visible. Dense reading surfaces and controls use other semantic tokens and
+ * retain their opaque backgrounds.
+ */
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"]
+[data-ct-part~="sidebar"] :where(
+  nav,
+  [role="navigation"],
+  [class~="bg-token-main-surface-primary"]
+),
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"]
+[data-ct-part~="main"] :where(
+  [role="main"],
+  [data-app-action-timeline-scroll],
+  [class~="bg-token-main-surface-primary"],
+  .scrollbar-stable
+),
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"]
+[data-ct-part~="right-panel"] :where(
+  [role="tabpanel"],
+  [data-app-shell-tabs="true"],
+  [class~="bg-token-main-surface-primary"]
+),
+html.codex-theme.codex-theme-has-art[data-ct-composition="continuous"]
+[data-ct-part~="settings"] :where(
+  .main-surface,
+  [role="main"],
+  [class~="bg-token-main-surface-primary"],
+  .scrollbar-stable
+) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+html.codex-theme .loading-shimmer-pure-text {
+  --shimmer-text-secondary: var(--ct-muted) !important;
+  --shimmer-contrast: var(--ct-text) !important;
+  color: var(--ct-muted) !important;
 }
 
 html.codex-theme :where(
@@ -56,15 +564,66 @@ html.codex-theme :where(
   box-shadow: var(--ct-shadow-high) !important;
 }
 
-html.codex-theme :where([role="menuitem"], [role="option"], [role="tab"], button) {
+/* Native home cards can carry light-mode colors; do not flatten every button state. */
+html.codex-theme[data-codex-theme-mode="dark"] :where([data-ct-part~="main"], main.main-surface, [role="main"]) :where(
+  [data-testid*="suggestion" i],
+  [data-testid*="home-card" i]
+) {
+  color: var(--ct-text) !important;
+  background: var(--ct-surface-raised) !important;
+  border-color: var(--ct-border) !important;
+}
+
+html.codex-theme :where([role="menuitem"], [role="option"], [role="tab"]) {
   color: inherit;
   border-color: var(--ct-border);
   border-radius: var(--ct-radius-small);
 }
 
-html.codex-theme :where([role="menuitem"], [role="option"], [role="tab"], button):is(:hover, [data-highlighted], [aria-selected="true"], [data-state="active"]) {
+html.codex-theme :where([role="menuitem"], [role="option"], [role="tab"]):is(:hover, [data-highlighted], [aria-selected="true"], [data-state="active"]) {
   color: var(--ct-text) !important;
   background-color: color-mix(in srgb, var(--ct-accent) 14%, var(--ct-surface-raised)) !important;
+}
+
+/*
+ * App-shell tabs use a dedicated icon-only close control. Keep its idle glyph
+ * visible instead of relying on the native secondary-icon token over artwork,
+ * and preserve a stronger hover/focus confirmation without changing geometry.
+ */
+html.codex-theme [data-app-shell-tab-strip-controller] {
+  --color-icon-secondary: var(--ct-text) !important;
+  --color-icon-tertiary: var(--ct-text) !important;
+}
+
+html.codex-theme [data-app-shell-tab-close-button] {
+  color: var(--ct-text) !important;
+  background-color: color-mix(in srgb, var(--ct-accent) 18%, var(--ct-surface-raised)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ct-accent) 42%, transparent) !important;
+  outline-color: var(--ct-focus) !important;
+}
+
+/*
+ * Right-panel tabs can restore before their selected state settles, leaving
+ * the native close control at opacity zero until pointer interaction. Keep
+ * that existing control painted while preserving native hit testing.
+ */
+html.codex-theme
+  [data-app-shell-focus-area="right-panel"]
+  [data-app-shell-tab-strip-controller="right"]
+  [data-app-shell-tab-close-button] {
+  opacity: 1 !important;
+}
+
+html.codex-theme [data-app-shell-tab-close-button]:is(:hover, :focus-visible, :active) {
+  color: var(--ct-accent-text) !important;
+  background-color: var(--ct-accent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ct-accent-text) 34%, transparent) !important;
+}
+
+html.codex-theme [data-app-shell-tab-close-button]:is(:disabled, [aria-disabled="true"]) {
+  color: var(--ct-muted) !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
 }
 
 html.codex-theme :where(a, [role="link"]) {
@@ -79,14 +638,13 @@ html.codex-theme :where(input, select, textarea, [contenteditable="true"]) {
 }
 
 html.codex-theme :where(
-  form:has(textarea),
-  form:has([contenteditable="true"]),
+  .composer-surface-chrome,
   [data-testid*="composer" i],
   [data-testid*="prompt-input" i]
 ) {
   color: var(--ct-text);
   background: var(--ct-surface-raised) !important;
-  border: 1px solid var(--ct-border) !important;
+  border-color: var(--ct-border) !important;
   border-radius: var(--ct-radius-large) !important;
   box-shadow: var(--ct-shadow-low) !important;
 }
@@ -116,7 +674,7 @@ html.codex-theme :where(code:not(pre code)) {
 }
 
 html.codex-theme :where(.xterm, [data-testid*="terminal" i], [class*="terminal" i]) {
-  color: #f4f7f8 !important;
+  color: var(--ct-terminal-text) !important;
   background: var(--ct-terminal-surface) !important;
   border-color: var(--ct-border) !important;
   backdrop-filter: none !important;
@@ -161,118 +719,92 @@ html.codex-theme :where([data-status="success"], [data-testid*="success" i]) { c
 html.codex-theme :where([data-status="warning"], [data-testid*="warning" i]) { color: var(--ct-warning) !important; }
 html.codex-theme :where([data-status="error"], [data-testid*="danger" i]) { color: var(--ct-danger) !important; }
 
-html.codex-theme[data-codex-theme="ink-ivory"] :where(main, [role="main"]) {
-  background-image: linear-gradient(90deg, transparent 0, transparent 31px, color-mix(in srgb, var(--ct-accent) 9%, transparent) 32px, transparent 33px);
-}
-
-html.codex-theme[data-codex-theme="ink-ivory"] :where(h1, h2) {
-  letter-spacing: -.025em;
-}
-
-html.codex-theme[data-codex-theme="paper-workshop"] body {
-  background-image:
-    linear-gradient(rgba(255, 248, 234, .84), rgba(239, 227, 207, .90)),
-    var(--ct-user-art, none),
-    repeating-linear-gradient(7deg, rgba(104, 81, 46, .035) 0 1px, transparent 1px 5px);
-}
-
-html.codex-theme[data-codex-theme="paper-workshop"] :where(main, aside, nav, [role="main"], [role="complementary"]) {
-  background-image:
-    radial-gradient(circle at 12% 8%, rgba(185, 85, 61, .06) 0 2px, transparent 3px),
-    repeating-linear-gradient(8deg, rgba(104, 81, 46, .025) 0 1px, transparent 1px 6px);
-}
-
-html.codex-theme[data-codex-theme="neon-workshop"] body {
-  background-image:
-    linear-gradient(rgba(79, 209, 197, .035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(155, 140, 255, .03) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-html.codex-theme[data-codex-theme="neon-workshop"] :where(*):focus-visible {
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--ct-focus) 20%, transparent);
-}
-
-html.codex-theme[data-codex-theme="expressive-signal"] :where(
-  [role="dialog"], [role="menu"], [role="listbox"],
-  form:has(textarea), form:has([contenteditable="true"])
-) {
-  border: 2px solid var(--ct-border) !important;
-}
-
-html.codex-theme[data-codex-theme="expressive-signal"] :where(button, [role="tab"])[aria-selected="true"] {
-  color: var(--ct-accent-text) !important;
-  background: var(--ct-accent) !important;
-  box-shadow: 2px 2px 0 var(--ct-border) !important;
-}
-
-/* Glass is intentionally limited to transient chrome and the composer. */
-html.codex-theme[data-codex-theme="liquid-focus"] :where(
-  header,
-  [data-testid*="header" i],
-  [data-testid*="toolbar" i],
-  [role="menu"],
-  [role="listbox"],
-  [data-testid*="popover" i],
-  form:has(textarea),
-  form:has([contenteditable="true"]),
-  [data-testid*="composer" i]
-) {
-  background: color-mix(in srgb, var(--ct-surface-raised) 76%, transparent) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(125%);
-  backdrop-filter: blur(18px) saturate(125%);
-}
-
-html.codex-theme[data-codex-theme="soft-tactile"] :where(
-  button:not([role="tab"]),
-  [data-testid*="suggestion" i],
-  [data-testid*="home-card" i]
-) {
-  background: var(--ct-surface) !important;
-  border: 1px solid color-mix(in srgb, var(--ct-border) 70%, transparent) !important;
-  box-shadow: var(--ct-shadow-low) !important;
-}
-
-html.codex-theme[data-codex-theme="soft-tactile"] :where(button:not([role="tab"])):active {
-  box-shadow: inset 2px 2px 5px #aab4c0, inset -2px -2px 5px #ffffff !important;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  html.codex-theme *,
-  html.codex-theme *::before,
-  html.codex-theme *::after {
-    scroll-behavior: auto !important;
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
+  html.codex-theme body::before,
+  html.codex-theme body::after,
+  html.codex-theme #codex-theme-chrome,
+  html.codex-theme [data-codex-theme-decoration] {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html.codex-theme body { background-image: none !important; }
+  html.codex-theme :where(
+    [data-testid*="header" i],
+    [data-testid*="toolbar" i],
+    [role="menu"],
+    [role="listbox"],
+    [data-testid*="popover" i],
+    .composer-surface-chrome,
+    [data-testid*="composer" i]
+  ) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: var(--ct-surface-raised) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  html.codex-theme [data-ct-part~="header"] {
+    background-color: var(--ct-surface-raised) !important;
+    background-image: none !important;
+    border-bottom-color: var(--ct-border) !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html.codex-theme [data-ct-part~="settings"] {
+    background-color: var(--ct-surface) !important;
+    background-image: none !important;
   }
 }
 
 @media (prefers-contrast: more) {
   html.codex-theme { --ct-border: currentColor; }
   html.codex-theme :where(button, input, select, textarea, [contenteditable="true"], [role="dialog"], [role="menu"]) {
-    border: 2px solid currentColor !important;
-    box-shadow: none !important;
+    border-color: currentColor !important;
+    box-shadow: inset 0 0 0 2px currentColor !important;
+  }
+}
+
+@media (max-width: 900px) {
+  html.codex-theme {
+    --ct-header-material-top-tint: 30%;
+    --ct-header-material-mid-tint: 46%;
+    --ct-header-material-bottom-tint: 60%;
+    --ct-header-material-control-tint: 18%;
+    --ct-settings-tint: 60%;
   }
 }
 
 @media (max-width: 720px) {
-  html.codex-theme body { background-image: none !important; }
-  html.codex-theme :where(header, [role="menu"], [role="listbox"], form:has(textarea), form:has([contenteditable="true"])) {
+  html.codex-theme[data-ct-narrow-art="hide-art"] body { background-image: none !important; }
+  html.codex-theme :where([role="menu"], [role="listbox"], .composer-surface-chrome) {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
     background: var(--ct-surface-raised) !important;
     box-shadow: none !important;
   }
-  html.codex-theme[data-codex-theme="soft-tactile"] :where(button, [data-testid*="suggestion" i], [data-testid*="home-card" i]) {
-    box-shadow: none !important;
+}
+
+@media (max-width: 620px) {
+  html.codex-theme {
+    --ct-header-material-top-tint: 42%;
+    --ct-header-material-mid-tint: 58%;
+    --ct-header-material-bottom-tint: 72%;
+    --ct-header-material-control-tint: 22%;
+    --ct-settings-tint: 68%;
   }
 }
 
 @media (forced-colors: active) {
+  html.codex-theme { forced-color-adjust: auto; }
   html.codex-theme,
   html.codex-theme body,
-  html.codex-theme :where(main, aside, nav, header, footer, [role="main"], [role="complementary"], [role="dialog"], [role="menu"], [role="listbox"]) {
+  html.codex-theme :where(main, aside, nav, header, footer, [role="main"], [role="complementary"], [role="dialog"], [role="menu"], [role="listbox"], [data-ct-part~="settings"]) {
     color: CanvasText !important;
     background: Canvas !important;
     border-color: CanvasText !important;
@@ -280,5 +812,36 @@ html.codex-theme[data-codex-theme="soft-tactile"] :where(button:not([role="tab"]
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
+  html.codex-theme body { background-image: none !important; }
+  html.codex-theme [data-ct-part~="header"] {
+    color: CanvasText !important;
+    background: Canvas !important;
+    border-bottom-color: CanvasText !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html.codex-theme :where(button, input, select, textarea, [contenteditable="true"], [role="button"]) {
+    color: ButtonText !important;
+    background: ButtonFace !important;
+    border-color: ButtonText !important;
+    box-shadow: none !important;
+  }
+  html.codex-theme [data-app-shell-tab-close-button] {
+    color: ButtonText !important;
+    background: ButtonFace !important;
+    border-color: ButtonText !important;
+  }
+  html.codex-theme [data-app-shell-tab-close-button]:focus-visible {
+    color: HighlightText !important;
+    background: Highlight !important;
+    outline-color: Highlight !important;
+  }
+  html.codex-theme :where([aria-selected="true"], [aria-checked="true"], [data-state="active"], [data-state="checked"]) {
+    color: HighlightText !important;
+    background: Highlight !important;
+    border-color: HighlightText !important;
+  }
+  html.codex-theme :where(a, [role="link"]) { color: LinkText !important; }
   html.codex-theme :where(*):focus-visible { outline-color: Highlight !important; }
 }

@@ -1,0 +1,19 @@
+html.codex-theme[data-codex-theme="neon-workshop"]
+body[data-ct-part~="workbench"] {
+  background-image:
+    linear-gradient(rgba(79, 209, 197, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 140, 255, .03) 1px, transparent 1px) !important;
+  background-size: 24px 24px !important;
+}
+
+html.codex-theme[data-codex-theme="neon-workshop"]
+:where(*):focus-visible {
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--ct-focus) 20%, transparent);
+}
+
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  html.codex-theme[data-codex-theme="neon-workshop"]
+  body[data-ct-part~="workbench"] {
+    background-image: none !important;
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "name": "customize-codex-theme",
+  "version": "3.3.0",
+  "canonicalInstall": {
+    "strategy": "codex-home-skill",
+    "skillName": "customize-codex-theme",
+    "environmentOverride": "CODEX_HOME"
+  },
+  "runtimeContractVersion": 2,
+  "authoringContractVersion": 2,
+  "compositionCompilerContractVersion": 1,
+  "governanceContractVersion": 1,
+  "selectorContractVersion": 1,
+  "compatibilityProbeContractVersion": 1,
+  "fixtureContractVersion": 2,
+  "qaContractVersion": 14,
+  "runtimeHashScope": "static-package-excluding-live-fixtures",
+  "runtimeHash": "70e697ee89c93ea2ca84f7105478e9c7ccf50120f3b491a1780f86db0d5796b9",
+  "migrationStatus": "canonical-portable-verified",
+  "migrationVerifiedAt": "2026-07-31",
+  "upstream": {
+    "repository": "https://github.com/Fei-Away/Codex-Dream-Skin",
+    "reviewedCommit": "611c101e4c2ee98031476570c54f448edc617b07",
+    "reviewedAt": "2026-07-30",
+    "mainStatus": "identical-to-reviewed-commit",
+    "relationship": "independent adaptation; no blind selector copy"
+  }
+}

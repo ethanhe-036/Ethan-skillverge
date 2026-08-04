@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "contractId": "codex-theme-platform-compatibility",
+  "contracts": {
+    "runtime": 2,
+    "authoring": 2,
+    "compositionCompiler": 1,
+    "governance": 1,
+    "selector": 1,
+    "compatibilityProbe": 1,
+    "fixture": 2,
+    "runtimeQa": 14,
+    "staticQuality": 4
+  },
+  "platforms": {
+    "windows": {
+      "builds": [
+        {
+          "version": "26.721.4979.0",
+          "status": "PARTIAL",
+          "evidence": "historical selector and launcher evidence remains, but its retained fixture is stale against the current runtime and cannot support PASS"
+        },
+        {
+          "version": "26.721.11231.0",
+          "status": "PARTIAL",
+          "evidence": "signed package discovery, doctor, CDP identity, and live runtime contract; full fixture matrix remains pending"
+        },
+        {
+          "version": "26.727.6591.0",
+          "status": "PARTIAL",
+          "evidence": "privacy-safe native structure probe passed required workbench, sidebar, and main anchors; themed full-surface QA remains pending",
+          "evidenceKind": "native-structure-probe",
+          "evidenceFile": "compatibility-evidence/windows-26.727.6591.0.json",
+          "evidenceSha256": "8a0077af12ff813c46c93978ffba5f0040027f9660e92580dc0d99d4cbf8eda8"
+        }
+      ],
+      "families": [
+        {
+          "minimum": "26.721.0.0",
+          "maximumExclusive": "26.722.0.0",
+          "status": "PARTIAL",
+          "evidence": "same Codex release family; live semantic verification is still required"
+        }
+      ],
+      "unknownBuildStatus": "UNSUPPORTED"
+    },
+    "macos": {
+      "builds": [],
+      "families": [
+        {
+          "minimum": "26.721.0.0",
+          "maximumExclusive": "26.722.0.0",
+          "status": "PARTIAL",
+          "evidence": "signed-bundle and runtime contracts exist; full visual matrix remains pending"
+        }
+      ],
+      "unknownBuildStatus": "UNSUPPORTED"
+    }
+  }
+}

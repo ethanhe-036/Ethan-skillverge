@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "contractId": "codex-theme-compatibility-evidence",
+  "probeContractVersion": 1,
+  "pass": true,
+  "compatible": true,
+  "status": "PARTIAL",
+  "mutationPerformed": false,
+  "platform": "windows",
+  "codexVersion": "26.727.6591.0",
+  "capturedAt": "2026-08-01T14:34:47.168Z",
+  "engineVersion": "2.6.0",
+  "port": 9341,
+  "privacy": {
+    "structureOnly": true,
+    "textCaptured": false,
+    "titlesCaptured": false,
+    "urlsCaptured": false,
+    "inputValuesCaptured": false,
+    "filePathsCaptured": false,
+    "htmlCaptured": false
+  },
+  "selectorContract": {
+    "contractId": "codex-theme-runtime-surfaces",
+    "schemaVersion": 1,
+    "hash": "8b6962918c37026c1fbaeff6b4155bb0b66d35e6b65bf6b3fa524591c6150567",
+    "verifiedAgainst": {
+      "platform": "windows",
+      "codexVersion": "26.727.6591.0",
+      "verifiedAt": "2026-08-01"
+    }
+  },
+  "appTargetCount": 2,
+  "qualifiedTargetCount": 1,
+  "failedTargetCount": 0,
+  "targets": [
+    {
+      "documentReady": true,
+      "rendererCandidate": true,
+      "requiredPass": true,
+      "requiredParts": [
+        "workbench",
+        "sidebar",
+        "main"
+      ],
+      "avatarSignals": false,
+      "themeMarkerPresent": false,
+      "scope": "home",
+      "viewport": {
+        "width": 1282,
+        "height": 754,
+        "deviceScaleFactor": 1.5
+      },
+      "overflowX": false,
+      "preferences": {
+        "reducedMotion": false,
+        "increasedContrast": false,
+        "forcedColors": false
+      },
+      "parts": {
+        "workbench": {
+          "tier": "L1",
+          "matchedCount": 1,
+          "resolvedCount": 1,
+          "visibleCount": 1,
+          "required": true,
+          "pass": true
+        },
+        "sidebar": {
+          "tier": "L1",
+          "matchedCount": 1,
+          "resolvedCount": 1,
+          "visibleCount": 1,
+          "required": true,
+          "pass": true
+        },
+        "header": {
+          "tier": "L2",
+          "matchedCount": 1,
+          "resolvedCount": 1,
+          "visibleCount": 1,
+          "required": false,
+          "pass": true
+        },
+        "main": {
+          "tier": "L1",
+          "matchedCount": 1,
+          "resolvedCount": 1,
+          "visibleCount": 1,
+          "required": true,
+          "pass": true
+        },
+        "right-panel": {
+          "tier": null,
+          "matchedCount": 0,
+          "resolvedCount": 0,
+          "visibleCount": 0,
+          "required": false,
+          "pass": true
+        },
+        "composer": {
+          "tier": "L1",
+          "matchedCount": 1,
+          "resolvedCount": 1,
+          "visibleCount": 1,
+          "required": false,
+          "pass": true
+        },
+        "settings": {
+          "tier": null,
+          "matchedCount": 0,
+          "resolvedCount": 0,
+          "visibleCount": 0,
+          "required": false,
+          "pass": true
+        },
+        "terminal": {
+          "tier": null,
+          "matchedCount": 0,
+          "resolvedCount": 0,
+          "visibleCount": 0,
+          "required": false,
+          "pass": true
+        },
+        "browser": {
+          "tier": null,
+          "matchedCount": 0,
+          "resolvedCount": 0,
+          "visibleCount": 0,
+          "required": false,
+          "pass": true
+        },
+        "dialog": {
+          "tier": null,
+          "matchedCount": 0,
+          "resolvedCount": 0,
+          "visibleCount": 0,
+          "required": false,
+          "pass": true
+        },
+        "menu": {
+          "tier": null,
+          "matchedCount": 0,
+          "resolvedCount": 0,
+          "visibleCount": 0,
+          "required": false,
+          "pass": true
+        },
+        "overlay": {
+          "tier": null,
+          "matchedCount": 0,
+          "resolvedCount": 0,
+          "visibleCount": 0,
+          "required": false,
+          "pass": true
+        }
+      }
+    }
+  ]
+}
