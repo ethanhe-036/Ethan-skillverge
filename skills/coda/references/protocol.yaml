@@ -1,0 +1,248 @@
+{
+  "version": 2,
+  "canonical": true,
+  "public_entries": [
+    "coda",
+    "$coda",
+    "cook",
+    "$cook-codex",
+    "COOK"
+  ],
+  "modes": {
+    "review_only": {
+      "aliases": [
+        "review",
+        "review-loop",
+        "review-only",
+        "review only",
+        "只review",
+        "不要改文件",
+        "REVIEW方案",
+        "仔细review",
+        "再次review",
+        "最终review",
+        "review一下上述更改"
+      ],
+      "capability_ceiling": {
+        "read": true,
+        "edit": false,
+        "run_local_checks": true,
+        "network": true,
+        "commit": false,
+        "push": false,
+        "git_merge": false,
+        "deploy": false,
+        "accept_risk": false
+      }
+    },
+    "review_fix": {
+      "aliases": [
+        "review-fix",
+        "review-fix loop",
+        "review fix-loop",
+        "review fix loop",
+        "fix-loop",
+        "有问题调整直到没问题",
+        "修完再review",
+        "fix until clean"
+      ],
+      "requires_explicit_capability": [
+        "edit"
+      ],
+      "capability_ceiling": {
+        "read": true,
+        "edit": true,
+        "run_local_checks": true,
+        "network": true,
+        "commit": true,
+        "push": true,
+        "git_merge": true,
+        "deploy": true,
+        "accept_risk": true
+      },
+      "does_not_grant": [
+        "commit",
+        "push",
+        "git_merge",
+        "deploy",
+        "accept_risk"
+      ]
+    },
+    "fixed_review": {
+      "pattern": "review N",
+      "range": [
+        1,
+        5
+      ],
+      "default_edit": false,
+      "with_explicit_edit": "review_fix_with_round_budget",
+      "limit_is_budget_only": true
+    }
+  },
+  "operators": {
+    "x3": "sequential_refinement",
+    "v3": "three_candidates",
+    "vs": "two_way_comparison",
+    "pick": "conceptual_selection",
+    "compare": "side_by_side_only",
+    "merge": "conceptual_synthesis",
+    "ralph": "explicit_task_source_iteration"
+  },
+  "authority": {
+    "fields": [
+      "read",
+      "edit",
+      "run_local_checks",
+      "network",
+      "commit",
+      "push",
+      "git_merge",
+      "deploy",
+      "accept_risk"
+    ],
+    "effective_rule": "explicit_user_grant INTERSECT environment_permission INTERSECT mode_ceiling",
+    "composition": "monotonic_non_increasing",
+    "negative_constraints_dominate": true,
+    "separate_explicit_grants": [
+      "commit",
+      "push",
+      "git_merge",
+      "deploy",
+      "accept_risk"
+    ]
+  },
+  "risk": {
+    "levels": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "medium_triggers": [
+      "cross_module",
+      "api_or_schema",
+      "persistent_state",
+      "configuration",
+      "async_path",
+      "production_entry"
+    ],
+    "high_triggers": [
+      "auth_or_security",
+      "tenant_isolation",
+      "data_loss",
+      "migration",
+      "billing",
+      "concurrency",
+      "irreversible_side_effect",
+      "deploy"
+    ]
+  },
+  "phases": [
+    "run_header",
+    "review_basis",
+    "bounded_work_or_review",
+    "findings_registry",
+    "challenge_gate",
+    "final_evidence"
+  ],
+  "readiness": [
+    "NOT_READY",
+    "FINDINGS_READY",
+    "VERIFIED",
+    "DELIVERY_READY"
+  ],
+  "readiness_transitions": {
+    "NOT_READY": [
+      "FINDINGS_READY",
+      "VERIFIED"
+    ],
+    "FINDINGS_READY": [
+      "NOT_READY",
+      "VERIFIED"
+    ],
+    "VERIFIED": [
+      "NOT_READY",
+      "DELIVERY_READY"
+    ],
+    "DELIVERY_READY": [
+      "NOT_READY",
+      "VERIFIED"
+    ]
+  },
+  "stop_reasons": [
+    "COMPLETE",
+    "ASK_USER",
+    "BLOCKED",
+    "BUDGET"
+  ],
+  "severity": {
+    "P0": "catastrophic_or_critical",
+    "P1": "major_no_safe_ordinary_workaround",
+    "P2": "meaningful_bounded_defect",
+    "P3": "minor_or_optional"
+  },
+  "finding_statuses": [
+    "Confirmed",
+    "Suspected",
+    "Fixed",
+    "Dismissed",
+    "Duplicate",
+    "Residual"
+  ],
+  "finding_registry": {
+    "lossless": true,
+    "stable_ids": true,
+    "focus_limit": 5,
+    "residual_requires": [
+      "accepted_by",
+      "acceptance_rationale",
+      "policy_ref_when_explicit_policy"
+    ]
+  },
+  "evidence": {
+    "state_bound": true,
+    "state_id": {
+      "git_inputs": [
+        "HEAD",
+        "staged_target_content",
+        "unstaged_target_content",
+        "relevant_untracked_target_content"
+      ],
+      "non_git_inputs": [
+        "reviewed_artifacts",
+        "relevant_configuration",
+        "relevant_dependency_inputs"
+      ],
+      "method_must_be_recorded": true
+    },
+    "required_fields": [
+      "obligation",
+      "state_id",
+      "command_or_oracle",
+      "result",
+      "coverage",
+      "limits"
+    ],
+    "invalidate_after_relevant_change": true
+  },
+  "challenge": {
+    "same_context_label": "Challenge",
+    "high_risk_requires_independence": true,
+    "independence_sources": [
+      "fresh_context",
+      "second_reviewer",
+      "independent_spec",
+      "independent_oracle",
+      "property",
+      "mutation",
+      "fault",
+      "compatibility",
+      "rollback"
+    ]
+  },
+  "compatibility": {
+    "DONE": {
+      "readiness": "VERIFIED",
+      "stop_reason": "COMPLETE"
+    }
+  }
+}
