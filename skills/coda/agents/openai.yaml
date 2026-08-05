@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coda"
+  short_description: "Risk-driven, state-bound review and review-fix workflows"
+  default_prompt: "Use $coda to review this task, or explicitly request review-fix, x3, v3, vs, or ralph when needed."
