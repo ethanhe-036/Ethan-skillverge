@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "minimumDuplicateChars": 220,
+  "allowDuplicateParagraphs": [],
+  "documents": [
+    {"id": "skill", "path": "SKILL.md", "maxTokens": 18000, "maxLines": 500},
+    {"id": "pptd", "path": "reference/pptd.md", "maxTokens": 40000},
+    {"id": "categories", "path": "reference/slides_categories.md", "maxTokens": 5000},
+    {"id": "deck-metadata", "path": "reference/deck-metadata.md", "maxTokens": 3000},
+    {"id": "asset-packs", "path": "reference/asset-packs.md", "maxTokens": 3000}
+  ],
+  "loadSets": [
+    {"id": "create-or-edit-pptd", "documents": ["skill", "pptd", "categories", "deck-metadata"], "maxTokens": 62000},
+    {"id": "asset-pack-admission", "documents": ["skill", "asset-packs"], "maxTokens": 22000}
+  ]
+}

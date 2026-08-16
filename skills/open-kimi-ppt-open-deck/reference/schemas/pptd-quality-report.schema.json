@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pptd-quality-report.schema.json",
+  "title": "PPTD quality report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "tool",
+    "project",
+    "source_binding",
+    "media",
+    "summary",
+    "issues",
+    "receipt"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {"const": "pptd_quality"},
+        "version": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "project": {
+      "type": "object",
+      "required": ["manifest", "title", "declared_pages", "bound_pages"],
+      "properties": {
+        "manifest": {"type": ["string", "null"]},
+        "title": {"type": ["string", "null"]},
+        "declared_pages": {"type": "integer", "minimum": 0},
+        "bound_pages": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "source_binding": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "complete",
+        "manifest",
+        "pages",
+        "deck_metadata",
+        "media_sources",
+        "media_files",
+        "deck_sha256"
+      ],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonicalization": {"const": "sorted-json-v2"},
+        "complete": {"type": "boolean"},
+        "manifest": {"$ref": "#/$defs/file_binding"},
+        "pages": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/page_binding"}
+        },
+        "deck_metadata": {"$ref": "#/$defs/file_binding"},
+        "media_sources": {"$ref": "#/$defs/file_binding"},
+        "media_files": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/file_binding"}
+        },
+        "deck_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "media": {
+      "type": "object",
+      "required": [
+        "referenced",
+        "present",
+        "missing",
+        "tracked",
+        "source_entries",
+        "sources_present"
+      ],
+      "properties": {
+        "referenced": {"type": "integer", "minimum": 0},
+        "present": {"type": "integer", "minimum": 0},
+        "missing": {"type": "integer", "minimum": 0},
+        "tracked": {"type": "integer", "minimum": 0},
+        "source_entries": {"type": "integer", "minimum": 0},
+        "sources_present": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": ["counts", "highest_severity", "fail_on", "passed"],
+      "properties": {
+        "counts": {"$ref": "#/$defs/counts"},
+        "highest_severity": {
+          "enum": ["none", "info", "warning", "error"]
+        },
+        "fail_on": {
+          "enum": ["none", "info", "warning", "error"]
+        },
+        "passed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "issues": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/issue"}
+    },
+    "receipt": {"$ref": "pptd-quality-receipt.schema.json"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "file_binding": {
+      "type": "object",
+      "required": ["path", "status", "bytes", "sha256"],
+      "properties": {
+        "path": {"type": ["string", "null"]},
+        "status": {
+          "enum": ["bound", "missing", "unreadable", "absent", "disabled"]
+        },
+        "bytes": {"type": ["integer", "null"], "minimum": 0},
+        "sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "bound"}}},
+          "then": {
+            "properties": {
+              "bytes": {"type": "integer"},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "page_binding": {
+      "type": "object",
+      "required": ["index", "path", "status", "bytes", "sha256"],
+      "properties": {
+        "index": {"type": "integer", "minimum": 0},
+        "path": {"type": ["string", "null"]},
+        "status": {"enum": ["bound", "missing", "unreadable"]},
+        "bytes": {"type": ["integer", "null"], "minimum": 0},
+        "sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "bound"}}},
+          "then": {
+            "properties": {
+              "bytes": {"type": "integer"},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": ["info", "warning", "error", "total"],
+      "properties": {
+        "info": {"type": "integer", "minimum": 0},
+        "warning": {"type": "integer", "minimum": 0},
+        "error": {"type": "integer", "minimum": 0},
+        "total": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "issue": {
+      "type": "object",
+      "required": ["severity", "code", "message"],
+      "properties": {
+        "severity": {"enum": ["info", "warning", "error"]},
+        "code": {"type": "string", "minLength": 1},
+        "message": {"type": "string", "minLength": 1},
+        "path": {"type": "string"},
+        "location": {"type": "string"},
+        "page_index": {"type": "integer", "minimum": 0},
+        "element_id": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

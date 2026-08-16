@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-deck-skill.invalid/schemas/asset-pack.schema.json",
+  "title": "Open Deck optional asset pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "pack_id",
+    "version",
+    "snapshot_date",
+    "kind",
+    "distribution",
+    "default_enabled",
+    "sources",
+    "assets"
+  ],
+  "properties": {
+    "pack_id": {"type": "string", "pattern": "^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$"},
+    "version": {"type": "string", "minLength": 1, "maxLength": 128},
+    "snapshot_date": {"type": "string", "format": "date"},
+    "kind": {"enum": ["icons", "sounds", "brand-specs", "brand-assets", "mixed"]},
+    "distribution": {"const": "optional-pack"},
+    "default_enabled": {"const": false},
+    "sources": {
+      "type": "object",
+      "maxProperties": 1000,
+      "additionalProperties": {"$ref": "#/$defs/source"}
+    },
+    "assets": {
+      "type": "array",
+      "maxItems": 50000,
+      "items": {"$ref": "#/$defs/asset"}
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["kind"],
+        "properties": {"kind": {"const": "mixed"}}
+      },
+      "then": {
+        "properties": {
+          "sources": {
+            "additionalProperties": {"required": ["content_kind"]}
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["kind"],
+        "properties": {"kind": {"const": "brand-assets"}}
+      },
+      "then": {
+        "properties": {
+          "sources": {
+            "additionalProperties": {
+              "required": ["permission_basis", "permission_evidence", "redistributable"],
+              "properties": {"redistributable": {"const": true}}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["license", "license_url", "source_url"],
+      "properties": {
+        "content_kind": {"enum": ["icons", "sounds", "brand-specs", "brand-assets"]},
+        "license": {"enum": ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "CC0-1.0", "CC-BY-4.0"]},
+        "license_url": {"type": "string", "format": "uri", "pattern": "^https://"},
+        "source_url": {"type": "string", "format": "uri", "pattern": "^https://"},
+        "notice": {"$ref": "#/$defs/path"},
+        "attribution": {"type": "string", "minLength": 1},
+        "contains_trademarks": {"type": "boolean", "default": false},
+        "usage_policy_url": {"type": "string", "format": "uri", "pattern": "^https://"},
+        "permission_basis": {"enum": ["user-supplied", "official-redistribution-license", "documented-written-permission"]},
+        "permission_evidence": {"$ref": "#/$defs/permission_evidence"},
+        "redistributable": {"type": "boolean"}
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": ["content_kind"],
+            "properties": {"content_kind": {"const": "brand-assets"}}
+          },
+          "then": {
+            "required": ["permission_basis", "permission_evidence", "redistributable"],
+            "properties": {"redistributable": {"const": true}}
+          }
+        }
+      ]
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "source", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"},
+        "source": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,126}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "derived_from": {"$ref": "#/$defs/path"},
+        "modifications": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "permission_evidence": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "url"],
+          "properties": {
+            "type": {"const": "url"},
+            "url": {"type": "string", "format": "uri", "pattern": "^https://"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "path", "sha256"],
+          "properties": {
+            "type": {"const": "file"},
+            "path": {"$ref": "#/$defs/path"},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      ]
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    }
+  }
+}

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Open Kimi PPT Local Export</title>
+    <style>
+      html,
+      body,
+      iframe {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0;
+      }
+
+      #status {
+        position: fixed;
+        z-index: 10;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 4px 10px;
+        border-radius: 6px;
+        background: rgb(0 0 0 / 72%);
+        color: white;
+        font: 12px/1.5 system-ui, sans-serif;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">starting</div>
+    <iframe id="editor"></iframe>
+    <script type="module">
+      import {
+        connect,
+        WindowMessenger,
+      } from "./penpal.mjs";
+
+      const status = document.querySelector("#status");
+      const frame = document.querySelector("#editor");
+      const editorOrigin = "https://www.kimi.com";
+      const MAX_TEXT_BYTES = 20 * 1024 * 1024;
+      const MAX_SAVE_BYTES = 100 * 1024 * 1024;
+      const MAX_SAVE_CHANGES = 600;
+      const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
+      const MAX_IMAGE_REQUESTS = 100;
+      const MAX_IMAGE_RESPONSE_BYTES = 100 * 1024 * 1024;
+      const MAX_LOCAL_IMAGE_PATH_CHARS = 4096;
+      const MAX_EXTERNAL_IMAGE_REFERENCE_BYTES = 16 * 1024;
+      const MAX_ENCODED_IMAGE_BYTES = Math.ceil(MAX_IMAGE_BYTES / 3) * 4 + 1024;
+      const textEncoder = new TextEncoder();
+
+      const utf8Bytes = (value) => textEncoder.encode(value).byteLength;
+
+      const setStatus = (value) => {
+        status.textContent = value;
+        document.documentElement.dataset.deckStatus = value;
+      };
+
+      const normalizePath = (value) => {
+        if (typeof value !== "string") return "";
+        if (/^(?:data:image\/|https?:\/\/|blob:)/i.test(value)) return value;
+        if (value.length > MAX_LOCAL_IMAGE_PATH_CHARS) {
+          throw new Error("image path exceeds the 4096-character safety limit");
+        }
+        const candidate = value.trim().replaceAll("\\", "/");
+        if (
+          !candidate
+          || candidate.startsWith("/")
+          || /^[A-Za-z]:\//.test(candidate)
+          || /^[A-Za-z][A-Za-z0-9+.-]*:/.test(candidate)
+        ) return "";
+        const parts = [];
+        for (const part of candidate.split("/")) {
+          if (!part || part === ".") continue;
+          if (part === "..") return "";
+          else parts.push(part);
+        }
+        return parts.join("/");
+      };
+
+      const resolveImage = (requestedPath, imageMap) => {
+        if (typeof requestedPath !== "string") return "";
+        if (/^data:image\//i.test(requestedPath)) {
+          if (requestedPath.length > MAX_ENCODED_IMAGE_BYTES) {
+            throw new Error("encoded image reference exceeds the per-image safety limit");
+          }
+          return requestedPath;
+        }
+        if (/^(?:https?:\/\/|blob:)/i.test(requestedPath)) {
+          if (utf8Bytes(requestedPath) > MAX_EXTERNAL_IMAGE_REFERENCE_BYTES) {
+            throw new Error("external image reference exceeds the safety limit");
+          }
+          return requestedPath;
+        }
+        const normalized = normalizePath(requestedPath);
+        return normalized && Object.hasOwn(imageMap, normalized)
+          && typeof imageMap[normalized] === "string"
+          ? imageMap[normalized]
+          : "";
+      };
+
+      const getBoundedImages = (imagePayload, imageMap) => {
+        const paths = Array.isArray(imagePayload?.filePath) ? imagePayload.filePath : [];
+        if (paths.length > MAX_IMAGE_REQUESTS) {
+          throw new Error(`image request exceeds the ${MAX_IMAGE_REQUESTS}-item safety limit`);
+        }
+        let responseBytes = 0;
+        const images = paths.map((path) => {
+          const resolved = resolveImage(path, imageMap);
+          responseBytes += utf8Bytes(resolved);
+          if (responseBytes > MAX_IMAGE_RESPONSE_BYTES) {
+            throw new Error("image response exceeds the 100 MiB safety limit");
+          }
+          return resolved;
+        });
+        return images;
+      };
+
+      const validateSaveEcho = (savePayload) => {
+        if (!savePayload || typeof savePayload !== "object" || Array.isArray(savePayload)) {
+          throw new Error("save payload must be an object");
+        }
+        const changes = savePayload.changes === undefined ? [] : savePayload.changes;
+        if (!Array.isArray(changes)) throw new Error("save changes must be an array");
+        if (changes.length > MAX_SAVE_CHANGES) {
+          throw new Error(`save request exceeds the ${MAX_SAVE_CHANGES}-change safety limit`);
+        }
+        let totalBytes = 0;
+        const addSaveText = (value, label, perValueLimit) => {
+          // A UTF-8 string is never shorter than its UTF-16 code-unit count.
+          // Check that cheap lower bound before asking TextEncoder to allocate.
+          if (value.length > perValueLimit || value.length > MAX_SAVE_BYTES - totalBytes) {
+            throw new Error(`${label} exceeds its safety limit`);
+          }
+          const bytes = utf8Bytes(value);
+          if (bytes > perValueLimit) {
+            throw new Error(`${label} exceeds its safety limit`);
+          }
+          totalBytes += bytes;
+          if (totalBytes > MAX_SAVE_BYTES) {
+            throw new Error("save request exceeds the 100 MiB safety limit");
+          }
+        };
+        for (const change of changes) {
+          if (!change || typeof change !== "object" || Array.isArray(change)) {
+            throw new Error("save change must be an object");
+          }
+          if (typeof change.path !== "string" || change.path.length > MAX_LOCAL_IMAGE_PATH_CHARS) {
+            throw new Error("save change path is invalid or too long");
+          }
+          addSaveText(
+            change.path,
+            "save change path",
+            MAX_LOCAL_IMAGE_PATH_CHARS * 4,
+          );
+          const operation = change.operate;
+          if (!["put", "create", "update", "delete"].includes(operation)) {
+            throw new Error("save change operation is unsupported");
+          }
+          if (operation !== "delete") {
+            if (typeof change.content !== "string") {
+              throw new Error("save change content must be a string");
+            }
+            addSaveText(change.content, "save change", MAX_TEXT_BYTES);
+          }
+        }
+        const fileContent = savePayload.fileContent;
+        if (fileContent === undefined || fileContent === null) return fileContent;
+        if (typeof fileContent === "string") {
+          addSaveText(fileContent, "save fileContent", MAX_TEXT_BYTES);
+          return fileContent;
+        }
+        if (!Array.isArray(fileContent)) {
+          throw new Error("save fileContent must be a string or file-content array");
+        }
+        if (fileContent.length > MAX_SAVE_CHANGES) {
+          throw new Error(
+            `save fileContent exceeds the ${MAX_SAVE_CHANGES}-file safety limit`,
+          );
+        }
+        for (const key of Object.keys(fileContent)) {
+          const index = Number(key);
+          if (
+            !Number.isSafeInteger(index)
+            || index < 0
+            || index >= fileContent.length
+            || String(index) !== key
+          ) {
+            throw new Error(`save fileContent array contains an unsupported field: ${key}`);
+          }
+        }
+        const sanitized = [];
+        for (let index = 0; index < fileContent.length; index += 1) {
+          if (!Object.hasOwn(fileContent, index)) {
+            throw new Error(`save fileContent array contains a hole at ${index}`);
+          }
+          const entry = fileContent[index];
+          if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+            throw new Error("save fileContent entry must be an object");
+          }
+          const prototype = Object.getPrototypeOf(entry);
+          if (prototype !== Object.prototype && prototype !== null) {
+            throw new Error("save fileContent entry must be a plain object");
+          }
+          const keys = Object.keys(entry);
+          if (
+            keys.length !== 2
+            || !keys.includes("path")
+            || !keys.includes("content")
+          ) {
+            throw new Error("save fileContent entry may contain only path and content");
+          }
+          if (typeof entry.path !== "string" || entry.path.length > MAX_LOCAL_IMAGE_PATH_CHARS) {
+            throw new Error("save fileContent path is invalid or too long");
+          }
+          if (typeof entry.content !== "string") {
+            throw new Error("save fileContent content must be a string");
+          }
+          addSaveText(
+            entry.path,
+            "save fileContent path",
+            MAX_LOCAL_IMAGE_PATH_CHARS * 4,
+          );
+          addSaveText(entry.content, "save fileContent content", MAX_TEXT_BYTES);
+          sanitized.push({ path: entry.path, content: entry.content });
+        }
+        return sanitized;
+      };
+
+      try {
+        const payload = await fetch("./payload.json", { cache: "no-store" }).then((response) => {
+          if (!response.ok) throw new Error(`payload HTTP ${response.status}`);
+          return response.json();
+        });
+
+        const query = new URLSearchParams({
+          sdkMode: "ppt-editor",
+          pptPlatform: "open-kimi-ppt-local-export",
+          functional: JSON.stringify({
+            fullscreen: false,
+            present: false,
+            export: true,
+            close: false,
+            annotation: false,
+            feedback: false,
+            share: false,
+            versionHistory: false,
+          }),
+          sdkSaveMode: "external",
+          sdkImageMode: "external",
+        });
+
+        frame.addEventListener(
+          "load",
+          async () => {
+            setStatus("iframe-loaded");
+            try {
+              const messenger = new WindowMessenger({
+                remoteWindow: frame.contentWindow,
+                allowedOrigins: [editorOrigin],
+              });
+              const connection = connect({
+                messenger,
+                methods: {
+                  close() {},
+                  reenter() {},
+                  toggleFullScreen(value) {
+                    return value;
+                  },
+                  showFeedback() {},
+                  sendPrompt() {},
+                  showMessage() {},
+                  hideMessage() {},
+                  onSave(savePayload) {
+                    const fileContent = validateSaveEcho(savePayload);
+                    return {
+                      fileContent,
+                      lastModifiedTime: Date.now(),
+                    };
+                  },
+                  getImages(imagePayload = {}) {
+                    return getBoundedImages(imagePayload, payload.imageMap || {});
+                  },
+                  setAnnotationMode() {},
+                  setAnnotationCurrentPage() {},
+                  upsertAnnotation() {},
+                  removeAnnotation() {},
+                  clearAnnotations() {},
+                },
+              });
+
+              const remote = await connection.promise;
+              window.exportRemote = remote;
+              await remote.setSlideConfig({
+                editable: true,
+                locale: "zh-CN",
+                theme: "light",
+                slideId: payload.id,
+              });
+              await remote.setPPTD(payload.id, {
+                pptdContent: payload.manifestContent,
+                pages: payload.pages,
+                pptdPath: payload.manifestPath,
+                basePath: "",
+                isCreate: true,
+              });
+              await remote.setEditable(true);
+              window.exportSlideStatus = await remote.getSlideStatus();
+              setStatus("ready");
+            } catch (error) {
+              window.exportHostError = String(error?.stack || error);
+              setStatus("error");
+            }
+          },
+          { once: true },
+        );
+
+        frame.src = `${editorOrigin}/neo-ppt/?${query}`;
+      } catch (error) {
+        window.exportHostError = String(error?.stack || error);
+        setStatus("error");
+      }
+    </script>
+  </body>
+</html>

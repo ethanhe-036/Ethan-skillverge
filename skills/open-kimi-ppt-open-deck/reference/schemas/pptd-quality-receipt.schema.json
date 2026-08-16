@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pptd-quality-receipt.schema.json",
+  "title": "PPTD compact quality receipt",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "source_sha256",
+    "source_complete",
+    "deck_metadata_sha256",
+    "media_sources_sha256",
+    "media_files",
+    "manifest",
+    "pages",
+    "media",
+    "issues",
+    "highest_severity",
+    "fail_on",
+    "passed"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_complete": {"type": "boolean"},
+    "deck_metadata_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "media_sources_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "media_files": {
+      "type": "object",
+      "required": ["declared", "bound"],
+      "properties": {
+        "declared": {"type": "integer", "minimum": 0},
+        "bound": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "manifest": {"type": ["string", "null"]},
+    "pages": {
+      "type": "object",
+      "required": ["declared", "bound"],
+      "properties": {
+        "declared": {"type": "integer", "minimum": 0},
+        "bound": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "media": {
+      "type": "object",
+      "required": ["referenced", "missing", "tracked"],
+      "properties": {
+        "referenced": {"type": "integer", "minimum": 0},
+        "missing": {"type": "integer", "minimum": 0},
+        "tracked": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "issues": {
+      "type": "object",
+      "required": ["info", "warning", "error", "total"],
+      "properties": {
+        "info": {"type": "integer", "minimum": 0},
+        "warning": {"type": "integer", "minimum": 0},
+        "error": {"type": "integer", "minimum": 0},
+        "total": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "highest_severity": {
+      "enum": ["none", "info", "warning", "error"]
+    },
+    "fail_on": {
+      "enum": ["none", "info", "warning", "error"]
+    },
+    "passed": {"type": "boolean"}
+  },
+  "additionalProperties": false
+}

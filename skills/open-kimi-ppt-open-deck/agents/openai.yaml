@@ -1,0 +1,10 @@
+interface:
+  display_name: "Open Kimi PPT - Open-Deck"
+  short_description: "Maintained quality-gated PPTD and PPTX workflow"
+  icon_small: "./assets/icon.svg"
+  icon_large: "./assets/logo.svg"
+  brand_color: "#6657E8"
+  default_prompt: "Use $open-kimi-ppt-open-deck to route this presentation task through the maintained quality-gated PPTD and PPTX workflow."
+
+policy:
+  allow_implicit_invocation: false
