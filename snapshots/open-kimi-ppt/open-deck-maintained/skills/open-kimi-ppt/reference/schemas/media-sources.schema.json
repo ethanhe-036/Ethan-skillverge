@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "media-sources.schema.json",
+  "title": "PPTD media provenance manifest",
+  "description": "Optional media/sources.json sidecar. Asset keys are canonical project-relative paths; every tracked file carries an exact SHA-256 and a non-empty license declaration.",
+  "type": "object",
+  "required": ["schema_version", "assets"],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "assets": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/asset"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "required": ["license", "sha256"],
+      "properties": {
+        "license": {
+          "type": "string",
+          "minLength": 1,
+          "description": "SPDX expression, named license, public-domain statement, or explicit generated/owned declaration."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{64}$",
+          "description": "SHA-256 of the exact local asset bytes."
+        },
+        "derived_from": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical project-relative path of the immediate source asset."
+        },
+        "source_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "attribution": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "treatments": {
+          "type": "array",
+          "items": {
+            "type": ["string", "object"]
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

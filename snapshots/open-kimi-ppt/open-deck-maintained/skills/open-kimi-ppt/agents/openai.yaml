@@ -1,0 +1,10 @@
+interface:
+  display_name: "Open Kimi PPT"
+  short_description: "Create PPTD; inspect, fill, and export PPTX safely"
+  icon_small: "./assets/icon.svg"
+  icon_large: "./assets/logo.svg"
+  brand_color: "#6657E8"
+  default_prompt: "Use $open-kimi-ppt to route this presentation task: author or edit PPTD, inspect or conservatively fill PPTX, or export the supported PPTD subset offline after a strict quality gate."
+
+policy:
+  allow_implicit_invocation: false

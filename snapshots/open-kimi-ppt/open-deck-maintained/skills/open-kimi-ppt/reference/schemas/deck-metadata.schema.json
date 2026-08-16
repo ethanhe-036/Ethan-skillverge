@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-deck-skill.invalid/schemas/deck-metadata.schema.json",
+  "title": "Open Deck project metadata and design lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "audience": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "objective": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "coreMessage": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "primaryLanguage": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$"
+    },
+    "consumptionMode": {"enum": ["live", "read", "print", "hybrid"]},
+    "pageRhythm": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {"enum": ["anchor", "dense", "breathing"]}
+    },
+    "targetApps": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["powerpoint", "libreoffice", "wps", "keynote", "web"]}
+    },
+    "mediaPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "licensePolicy": {"enum": ["known-only", "allow-user-supplied", "project-defined"]},
+        "requireAttribution": {"type": "boolean"},
+        "allowRemote": {"type": "boolean"},
+        "allowGenerative": {"type": "boolean"}
+      }
+    },
+    "transitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default": {"$ref": "#/$defs/transition"},
+        "pages": {
+          "type": "object",
+          "maxProperties": 500,
+          "additionalProperties": {"$ref": "#/$defs/transition"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {"enum": ["none", "fade", "push", "wipe", "morph"]},
+        "direction": {"enum": ["left", "right", "up", "down"]},
+        "durationMs": {"type": "integer", "minimum": 0, "maximum": 60000},
+        "advanceAfterMs": {"type": "integer", "minimum": 0, "maximum": 86400000},
+        "advanceOnClick": {"type": "boolean"}
+      }
+    }
+  }
+}
