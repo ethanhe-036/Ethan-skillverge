@@ -2,6 +2,8 @@
 
 This directory preserves two pinned historical variants of the Open Kimi PPT skill for comparison and recovery. They are archived snapshots, not active SkillVerge installations.
 
+Installable adaptations with unique Skill IDs are available at `skills/open-kimi-ppt-original-1-3-0/` and `skills/open-kimi-ppt-open-deck/`. The snapshots below remain byte-for-byte provenance references.
+
 | Snapshot | Archived path | Upstream source | Pinned commit | License |
 | --- | --- | --- | --- | --- |
 | Original 1.3.0 | `original-1.3.0/` | [WangEn/open-kimi-ppt-skill](https://github.com/WangEn/open-kimi-ppt-skill) | `07eeaadcb04c32c9adb107eb5c8608e6be4e1008` | MIT; see the included `LICENSE` |

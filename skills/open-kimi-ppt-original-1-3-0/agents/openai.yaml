@@ -1,0 +1,7 @@
+interface:
+  display_name: "Open Kimi PPT Original 1.3.0"
+  short_description: "Original 1.3.0 PPTD creation and export workflow"
+  default_prompt: "Use $open-kimi-ppt-original-1-3-0 to create and export a PPTD presentation with the original 1.3.0 workflow."
+
+policy:
+  allow_implicit_invocation: false

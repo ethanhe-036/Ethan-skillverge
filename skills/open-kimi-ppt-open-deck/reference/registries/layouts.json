@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "coordinateSystem": "normalized [x,y,width,height] in the safe content area",
+  "layouts": [
+    {"id": "hero-cover", "pickFor": ["opening", "single decisive statement"], "skipIf": ["dense evidence"], "regions": {"title": [0.08, 0.2, 0.62, 0.34], "context": [0.08, 0.62, 0.42, 0.12]}},
+    {"id": "section-divider", "pickFor": ["chapter transition", "agenda reset"], "skipIf": ["ordinary content page"], "regions": {"chapter": [0.08, 0.18, 0.34, 0.62], "agenda": [0.5, 0.2, 0.42, 0.58]}},
+    {"id": "assertion-two-column", "pickFor": ["claim with two evidence streams", "before-after"], "skipIf": ["more than two unrelated arguments"], "regions": {"title": [0.05, 0.04, 0.9, 0.12], "left": [0.05, 0.2, 0.54, 0.65], "right": [0.63, 0.2, 0.32, 0.65], "synthesis": [0.05, 0.88, 0.9, 0.08]}},
+    {"id": "comparison-three", "pickFor": ["three peers", "three scenarios"], "skipIf": ["continuous time series", "long prose"], "regions": {"title": [0.05, 0.04, 0.9, 0.12], "a": [0.05, 0.21, 0.28, 0.64], "b": [0.36, 0.21, 0.28, 0.64], "c": [0.67, 0.21, 0.28, 0.64]}},
+    {"id": "metric-grid", "pickFor": ["four to six KPIs", "scorecard"], "skipIf": ["causal explanation"], "regions": {"title": [0.05, 0.04, 0.9, 0.12], "grid": [0.05, 0.2, 0.9, 0.66], "synthesis": [0.05, 0.89, 0.9, 0.07]}},
+    {"id": "chart-insight", "pickFor": ["one quantitative conclusion", "trend plus interpretation"], "skipIf": ["multiple unrelated charts"], "regions": {"title": [0.05, 0.04, 0.9, 0.12], "chart": [0.05, 0.21, 0.62, 0.62], "insight": [0.71, 0.21, 0.24, 0.62], "source": [0.05, 0.88, 0.9, 0.06]}},
+    {"id": "evidence-table", "pickFor": ["multi-dimensional comparison", "risk register"], "skipIf": ["fewer than two dimensions"], "regions": {"title": [0.05, 0.04, 0.9, 0.12], "table": [0.05, 0.2, 0.9, 0.66], "source": [0.05, 0.89, 0.9, 0.05]}},
+    {"id": "process-roadmap", "pickFor": ["ordered stages", "implementation plan"], "skipIf": ["non-sequential categories"], "regions": {"title": [0.05, 0.04, 0.9, 0.12], "track": [0.07, 0.3, 0.86, 0.22], "details": [0.07, 0.57, 0.86, 0.28]}},
+    {"id": "timeline", "pickFor": ["dated milestones", "evolution"], "skipIf": ["no meaningful time order"], "regions": {"title": [0.05, 0.04, 0.9, 0.12], "timeline": [0.07, 0.22, 0.86, 0.58], "implication": [0.07, 0.84, 0.86, 0.1]}},
+    {"id": "matrix-two-by-two", "pickFor": ["two independent dimensions", "portfolio prioritization"], "skipIf": ["axes are not defensible"], "regions": {"title": [0.05, 0.04, 0.9, 0.12], "matrix": [0.08, 0.22, 0.58, 0.65], "interpretation": [0.71, 0.22, 0.24, 0.65]}},
+    {"id": "image-story", "pickFor": ["product", "place", "case evidence"], "skipIf": ["image is decorative or low resolution"], "regions": {"image": [0.0, 0.0, 0.6, 1.0], "title": [0.65, 0.12, 0.29, 0.25], "evidence": [0.65, 0.45, 0.29, 0.38]}},
+    {"id": "conclusion-actions", "pickFor": ["closing claims", "owner-specific actions"], "skipIf": ["new evidence is still being introduced"], "regions": {"title": [0.05, 0.05, 0.9, 0.14], "claims": [0.05, 0.24, 0.48, 0.62], "actions": [0.58, 0.24, 0.37, 0.62]}}
+  ]
+}

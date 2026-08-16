@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "charts": [
+    {"id": "bar", "pickFor": ["category comparison", "ranking", "part-to-whole with stack"], "skipIf": ["irregular numeric x spacing"], "nativePptd": true},
+    {"id": "line", "pickFor": ["time trend", "rate of change"], "skipIf": ["unordered categories", "single isolated value"], "nativePptd": true},
+    {"id": "area", "pickFor": ["cumulative magnitude over time", "stacked composition trend"], "skipIf": ["precise overlap comparison"], "nativePptd": true},
+    {"id": "scatter", "pickFor": ["relationship between two numeric variables", "clusters and outliers"], "skipIf": ["categorical x axis"], "nativePptd": true},
+    {"id": "bubble", "pickFor": ["three numeric dimensions"], "skipIf": ["size values are not comparable", "too many overlapping marks"], "nativePptd": true},
+    {"id": "candlestick", "pickFor": ["OHLC or HLC financial series"], "skipIf": ["ordinary trend data"], "nativePptd": true},
+    {"id": "pie", "pickFor": ["one simple part-to-whole snapshot with few categories"], "skipIf": ["more than six slices", "close comparisons", "negative values"], "nativePptd": true},
+    {"id": "radar", "pickFor": ["profile across a common small dimension set"], "skipIf": ["precise magnitude comparison", "different spoke sets"], "nativePptd": true},
+    {"id": "waterfall", "pickFor": ["bridge from opening to closing value", "positive and negative drivers"], "skipIf": ["no defensible total arithmetic"], "nativePptd": true},
+    {"id": "heatmap", "pickFor": ["dense two-dimensional matrix", "pattern and hotspot detection"], "skipIf": ["exact values are primary"], "nativePptd": true},
+    {"id": "treemap", "pickFor": ["hierarchical part-to-whole with many leaves"], "skipIf": ["precise comparisons", "negative values"], "nativePptd": true},
+    {"id": "sunburst", "pickFor": ["hierarchy depth and branch share"], "skipIf": ["long labels", "precise comparisons"], "nativePptd": true},
+    {"id": "sankey", "pickFor": ["flow between named stages in a DAG"], "skipIf": ["cycles", "unquantified relationships"], "nativePptd": true}
+  ]
+}
